@@ -1,5 +1,7 @@
 package collections
 
+import "github.com/tursom/GoCollections/exceptions"
+
 type SubList struct {
 	list     List
 	from, to uint32
@@ -36,7 +38,7 @@ func (s *SubList) ContainsAll(c Collection) bool {
 	return ContainsAll(s, c)
 }
 
-func (s *SubList) Get(index uint32) (interface{}, error) {
+func (s *SubList) Get(index uint32) (interface{}, exceptions.Exception) {
 	return s.list.Get(index + s.from)
 }
 

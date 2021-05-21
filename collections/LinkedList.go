@@ -50,8 +50,8 @@ func (l *LinkedList) Add(element interface{}) bool {
 	return true
 }
 
-func (l *LinkedList) Remove(element interface{}) error {
-	err := LoopMutable(l, func(e interface{}, iterator MutableIterator) error {
+func (l *LinkedList) Remove(element interface{}) exceptions.Exception {
+	err := LoopMutable(l, func(e interface{}, iterator MutableIterator) exceptions.Exception {
 		if element == e {
 			iterator.Remove()
 			return exceptions.CollectionLoopFinished
@@ -86,7 +86,7 @@ func (l LinkedList) SubList(from, to uint32) List {
 	return NewSubList(l, from, to)
 }
 
-func (l *LinkedList) Set(index uint32, element interface{}) error {
+func (l *LinkedList) Set(index uint32, element interface{}) exceptions.Exception {
 	node := l.head
 	for node != l.head {
 		if index == 0 {
@@ -112,7 +112,7 @@ func (l *LinkedList) AddAtIndex(index uint32, element interface{}) bool {
 	return false
 }
 
-func (l *LinkedList) RemoveAt(index uint32) error {
+func (l *LinkedList) RemoveAt(index uint32) exceptions.Exception {
 	node := l.head
 	for node != l.head {
 		if index == 0 {
@@ -129,7 +129,7 @@ func (l *LinkedList) SubMutableList(from, to uint32) MutableList {
 	return NewMutableSubList(l, from, to)
 }
 
-func (l LinkedList) Get(index uint32) (interface{}, error) {
+func (l LinkedList) Get(index uint32) (interface{}, exceptions.Exception) {
 	node := l.head
 	for node != l.head {
 		if index == 0 {
@@ -158,7 +158,7 @@ func (l *linkedListIterator) HasNext() bool {
 	return l.node != l.head
 }
 
-func (l *linkedListIterator) Next() (interface{}, error) {
+func (l *linkedListIterator) Next() (interface{}, exceptions.Exception) {
 	if l.node == l.head {
 		return nil, exceptions.NewIndexOutOfBound("", true)
 	}
@@ -166,7 +166,7 @@ func (l *linkedListIterator) Next() (interface{}, error) {
 	return l.node.prev.value, nil
 }
 
-func (l *linkedListIterator) Remove() error {
+func (l *linkedListIterator) Remove() exceptions.Exception {
 	if l.node.prev == l.head {
 		return exceptions.NewIndexOutOfBound("", true)
 	}

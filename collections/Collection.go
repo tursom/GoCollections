@@ -24,7 +24,7 @@ type (
 
 		MutableIterator() MutableIterator
 		Add(element interface{}) bool
-		Remove(element interface{}) error
+		Remove(element interface{}) exceptions.Exception
 		AddAll(c Collection) bool
 		RemoveAll(c Collection) bool
 		RetainAll(c Collection) bool
@@ -38,7 +38,7 @@ type (
 		Contains(element interface{}) bool
 		ContainsAll(c Collection) bool
 
-		Get(index uint32) (interface{}, error)
+		Get(index uint32) (interface{}, exceptions.Exception)
 		SubList(from, to uint32) List
 	}
 
@@ -51,24 +51,24 @@ type (
 
 		MutableIterator() MutableIterator
 		Add(element interface{}) bool
-		Remove(element interface{}) error
+		Remove(element interface{}) exceptions.Exception
 		AddAll(c Collection) bool
 		RemoveAll(c Collection) bool
 		RetainAll(c Collection) bool
 		Clear()
 
-		Get(index uint32) (interface{}, error)
+		Get(index uint32) (interface{}, exceptions.Exception)
 		SubList(from, to uint32) List
 
-		Set(index uint32, element interface{}) error
+		Set(index uint32, element interface{}) exceptions.Exception
 		AddAtIndex(index uint32, element interface{}) bool
-		RemoveAt(index uint32) error
+		RemoveAt(index uint32) exceptions.Exception
 		SubMutableList(from, to uint32) MutableList
 	}
 )
 
 func Contains(l Collection, element interface{}) bool {
-	return Loop(l, func(e interface{}) error {
+	return Loop(l, func(e interface{}) exceptions.Exception {
 		if e == element {
 			return exceptions.ElementFound
 		}
@@ -77,7 +77,7 @@ func Contains(l Collection, element interface{}) bool {
 }
 
 func ContainsAll(l Collection, collection Collection) bool {
-	return Loop(collection, func(e interface{}) error {
+	return Loop(collection, func(e interface{}) exceptions.Exception {
 		if l.Contains(e) {
 			return nil
 		} else {
@@ -87,7 +87,7 @@ func ContainsAll(l Collection, collection Collection) bool {
 }
 
 func AddAll(l MutableCollection, collection Collection) bool {
-	return Loop(collection, func(e interface{}) error {
+	return Loop(collection, func(e interface{}) exceptions.Exception {
 		if !l.Add(e) {
 			return exceptions.CollectionLoopFinished
 		}
@@ -96,13 +96,13 @@ func AddAll(l MutableCollection, collection Collection) bool {
 }
 
 func RemoveAll(l MutableCollection, collection Collection) bool {
-	return Loop(collection, func(e interface{}) error {
+	return Loop(collection, func(e interface{}) exceptions.Exception {
 		return l.Remove(e)
 	}) == nil
 }
 
 func RetainAll(l MutableCollection, collection Collection) bool {
-	return LoopMutable(l, func(element interface{}, iterator MutableIterator) error {
+	return LoopMutable(l, func(element interface{}, iterator MutableIterator) exceptions.Exception {
 		if !collection.Contains(element) {
 			return iterator.Remove()
 		}

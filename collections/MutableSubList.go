@@ -38,7 +38,7 @@ func (s *MutableSubList) ContainsAll(c Collection) bool {
 	return ContainsAll(s, c)
 }
 
-func (s *MutableSubList) Get(index uint32) (interface{}, error) {
+func (s *MutableSubList) Get(index uint32) (interface{}, exceptions.Exception) {
 	return s.list.Get(index + s.from)
 }
 
@@ -54,7 +54,7 @@ func (s *MutableSubList) Add(_ interface{}) bool {
 	return false
 }
 
-func (s *MutableSubList) Remove(element interface{}) error {
+func (s *MutableSubList) Remove(element interface{}) exceptions.Exception {
 	return nil
 }
 
@@ -73,7 +73,7 @@ func (s *MutableSubList) RetainAll(_ Collection) bool {
 func (s *MutableSubList) Clear() {
 }
 
-func (s *MutableSubList) Set(index uint32, element interface{}) error {
+func (s *MutableSubList) Set(index uint32, element interface{}) exceptions.Exception {
 	if index >= s.to-s.from {
 		return exceptions.NewIndexOutOfBound("", true)
 	}
@@ -84,7 +84,7 @@ func (s *MutableSubList) AddAtIndex(_ uint32, _ interface{}) bool {
 	return false
 }
 
-func (s *MutableSubList) RemoveAt(index uint32) error {
+func (s *MutableSubList) RemoveAt(index uint32) exceptions.Exception {
 	return exceptions.NewOperationNotSupportedException("", true)
 }
 

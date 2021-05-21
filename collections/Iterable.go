@@ -4,7 +4,7 @@ import "github.com/tursom/GoCollections/exceptions"
 
 type Iterator interface {
 	HasNext() bool
-	Next() (interface{}, error)
+	Next() (interface{}, exceptions.Exception)
 }
 
 type Iterable interface {
@@ -13,8 +13,8 @@ type Iterable interface {
 
 type MutableIterator interface {
 	HasNext() bool
-	Next() (interface{}, error)
-	Remove() error
+	Next() (interface{}, exceptions.Exception)
+	Remove() exceptions.Exception
 }
 
 type MutableIterable interface {
@@ -22,11 +22,24 @@ type MutableIterable interface {
 	MutableIterator() MutableIterator
 }
 
-func Loop(iterable Iterable, f func(element interface{}) error) error {
-	if f == nil {
+func Loop(iterable Iterable, f func(element interface{}) exceptions.Exception) exceptions.Exception {
+	if f == nil || iterable == nil {
 		return exceptions.NewNPE("", true)
 	}
-	iterator := iterable.Iterator()
+	return LoopIterator(iterable.Iterator(), f)
+}
+
+func LoopMutable(iterable MutableIterable, f func(element interface{}, iterator MutableIterator) (err exceptions.Exception)) exceptions.Exception {
+	if f == nil || iterable == nil {
+		return exceptions.NewNPE("", true)
+	}
+	return LoopMutableIterator(iterable.MutableIterator(), f)
+}
+
+func LoopIterator(iterator Iterator, f func(element interface{}) exceptions.Exception) exceptions.Exception {
+	if f == nil || iterator == nil {
+		return exceptions.NewNPE("", true)
+	}
 	for iterator.HasNext() {
 		next, err := iterator.Next()
 		if err != nil {
@@ -40,11 +53,10 @@ func Loop(iterable Iterable, f func(element interface{}) error) error {
 	return nil
 }
 
-func LoopMutable(iterable MutableIterable, f func(element interface{}, iterator MutableIterator) (err error)) error {
-	if f == nil {
-		return nil
+func LoopMutableIterator(iterator MutableIterator, f func(element interface{}, iterator MutableIterator) (err exceptions.Exception)) exceptions.Exception {
+	if f == nil || iterator == nil {
+		return exceptions.NewNPE("", true)
 	}
-	iterator := iterable.MutableIterator()
 	for iterator.HasNext() {
 		next, err := iterator.Next()
 		if err != nil {

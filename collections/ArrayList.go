@@ -59,7 +59,7 @@ func (a ArrayList) IndexOf(element interface{}) int {
 	return -1
 }
 
-func (a *ArrayList) Remove(element interface{}) error {
+func (a *ArrayList) Remove(element interface{}) exceptions.Exception {
 	index := a.IndexOf(element)
 	if index < 0 {
 		return exceptions.NewElementNotFoundException("", true)
@@ -84,7 +84,7 @@ func (a *ArrayList) Clear() {
 	a.used = 0
 }
 
-func (a ArrayList) Get(index uint32) (interface{}, error) {
+func (a ArrayList) Get(index uint32) (interface{}, exceptions.Exception) {
 	if index >= a.used {
 		return nil, exceptions.NewIndexOutOfBound("", true)
 	} else {
@@ -96,7 +96,7 @@ func (a ArrayList) SubList(from, to uint32) List {
 	return NewSubList(a, from, to)
 }
 
-func (a *ArrayList) Set(index uint32, element interface{}) error {
+func (a *ArrayList) Set(index uint32, element interface{}) exceptions.Exception {
 	if index >= a.used {
 		return exceptions.NewIndexOutOfBound("", true)
 	}
@@ -118,7 +118,7 @@ func (a *ArrayList) AddAtIndex(index uint32, element interface{}) bool {
 	return true
 }
 
-func (a *ArrayList) RemoveAt(index uint32) error {
+func (a *ArrayList) RemoveAt(index uint32) exceptions.Exception {
 	if index >= a.used {
 		return exceptions.NewIndexOutOfBound("", true)
 	}
@@ -148,7 +148,7 @@ func (a *arrayListIterator) HasNext() bool {
 	return a.index < a.arrayList.used
 }
 
-func (a *arrayListIterator) Next() (interface{}, error) {
+func (a *arrayListIterator) Next() (interface{}, exceptions.Exception) {
 	value, err := a.arrayList.Get(a.index)
 	if err != nil {
 		return nil, err
@@ -157,7 +157,7 @@ func (a *arrayListIterator) Next() (interface{}, error) {
 	return value, nil
 }
 
-func (a *arrayListIterator) Remove() error {
+func (a *arrayListIterator) Remove() exceptions.Exception {
 	err := a.arrayList.RemoveAt(a.index - 1)
 	if err != nil {
 		return err

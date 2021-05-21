@@ -7,18 +7,13 @@ import (
 )
 
 func main() {
-	_, err := exceptions.Try(func() (interface{}, error) {
+	_, err := exceptions.Try(func() (interface{}, exceptions.Exception) {
 		panic("test")
-	}, func(r interface{}) (interface{}, error) {
+	}, func(r interface{}) (interface{}, exceptions.Exception) {
 		fmt.Println("recover from panic", r)
 		return nil, exceptions.NewIndexOutOfBound(fmt.Sprint(r), true)
 	})
-	exceptions.NewRuntimeException(
-		err,
-		"test exception:",
-		true,
-		err,
-	).PrintStackTrace()
+	exceptions.Print(err)
 
 	list := collections.NewArrayList()
 	fmt.Println(list)
@@ -27,7 +22,7 @@ func main() {
 		//fmt.Println(list)
 	}
 
-	_ = collections.LoopMutable(list, func(element interface{}, iterator collections.MutableIterator) (err error) {
+	_ = collections.LoopMutable(list, func(element interface{}, iterator collections.MutableIterator) (err exceptions.Exception) {
 		if element.(int)&1 == 0 {
 			err = iterator.Remove()
 		}

@@ -56,9 +56,9 @@ func BuildStackTrace(builder *strings.Builder, e Exception, exceptionMsg string)
 }
 
 func Try(
-	f func() (ret interface{}, err error),
-	catch func(panic interface{}) (ret interface{}, err error),
-) (ret interface{}, err error) {
+	f func() (ret interface{}, err Exception),
+	catch func(panic interface{}) (ret interface{}, err Exception),
+) (ret interface{}, err Exception) {
 	defer func() {
 		if r := recover(); r != nil {
 			ret, err = catch(r)
