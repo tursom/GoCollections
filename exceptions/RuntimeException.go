@@ -13,7 +13,7 @@ type RuntimeException struct {
 	cause            Exception
 }
 
-func NewRuntimeException(message, exceptionMessage string, getStackTrace bool, cause Exception) RuntimeException {
+func NewRuntimeException(message, exceptionMessage string, getStackTrace bool, cause interface{}) RuntimeException {
 	var stackTrace []StackTrace = nil
 	if getStackTrace {
 		stackTrace = GetStackTrace()
@@ -23,11 +23,17 @@ func NewRuntimeException(message, exceptionMessage string, getStackTrace bool, c
 		exceptionMessage = "exception caused:"
 	}
 
+	var causeException Exception = nil
+	switch cause.(type) {
+	case Exception:
+		causeException = cause.(Exception)
+	}
+
 	return RuntimeException{
 		message:          message,
 		exceptionMessage: exceptionMessage,
 		stackTrace:       stackTrace,
-		cause:            cause,
+		cause:            causeException,
 	}
 }
 
