@@ -88,5 +88,21 @@ func Package(err error) Exception {
 	if err == nil {
 		return nil
 	}
+	switch err.(type) {
+	case Exception:
+		return err.(Exception)
+	}
 	return NewRuntimeException(err, "", true, err)
+}
+
+func PackageAny(err interface{}) Exception {
+	if err == nil {
+		return nil
+	}
+	switch err.(type) {
+	case error:
+		return Package(err.(error))
+	default:
+		return NewRuntimeException(err, "", true, nil)
+	}
 }
