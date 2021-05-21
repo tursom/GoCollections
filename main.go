@@ -15,11 +15,11 @@ func main() {
 	})
 	exceptions.Print(err)
 
-	list := collections.NewArrayList()
+	list := collections.NewConcurrentLinkedQueue()
 	fmt.Println(list)
 	for i := 0; i < 20; i++ {
-		list.Add(i)
-		//fmt.Println(list)
+		list.Push(i)
+		fmt.Println(list)
 	}
 
 	_ = collections.LoopMutable(list, func(element interface{}, iterator collections.MutableIterator) (err exceptions.Exception) {

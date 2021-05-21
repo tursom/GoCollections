@@ -110,14 +110,14 @@ func RetainAll(l MutableCollection, collection Collection) bool {
 	}) == nil
 }
 
-func String(l List) string {
-	if l.IsEmpty() {
+func String(l Iterable) string {
+	iterator := l.Iterator()
+	if !iterator.HasNext() {
 		return "[]"
 	}
 
 	builder := strings.Builder{}
 	builder.WriteString("[")
-	iterator := l.Iterator()
 	next, _ := iterator.Next()
 	builder.WriteString(fmt.Sprint(next))
 	for iterator.HasNext() {
