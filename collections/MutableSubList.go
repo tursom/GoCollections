@@ -84,8 +84,8 @@ func (s *MutableSubList) AddAtIndex(_ uint32, _ interface{}) bool {
 	return false
 }
 
-func (s *MutableSubList) RemoveAt(_ uint32) bool {
-	return false
+func (s *MutableSubList) RemoveAt(index uint32) error {
+	return exceptions.NewOperationNotSupportedException("", true)
 }
 
 func (s *MutableSubList) SubMutableList(from, to uint32) MutableList {

@@ -25,15 +25,15 @@ func PrintStackTrace(writer io.Writer, e Exception, exceptionMsg string) {
 	}
 }
 
-func Try(f func() (interface{}, error), catch func(interface{}) interface{}) (ret interface{}) {
+func Try(f func() (ret interface{}, err error), catch func(interface{}) (ret interface{}, err error)) (ret interface{}, err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			ret = catch(r)
+			ret, err = catch(r)
 		}
 	}()
-	ret, err := f()
+	ret, err = f()
 	if err != nil {
-		ret = catch(err)
+		ret, err = catch(err)
 	}
 	return
 }

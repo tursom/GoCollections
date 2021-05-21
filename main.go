@@ -7,26 +7,27 @@ import (
 )
 
 func main() {
-	fmt.Println(exceptions.Try(func() (interface{}, error) {
+	_, err := exceptions.Try(func() (interface{}, error) {
 		panic("test")
-	}, func(r interface{}) interface{} {
+	}, func(r interface{}) (interface{}, error) {
 		fmt.Println("recover from panic", r)
-		return exceptions.NewIndexOutOfBound("", true)
-	}))
+		return nil, exceptions.NewIndexOutOfBound(fmt.Sprint(r), true)
+	})
+	err.(exceptions.Exception).PrintStackTrace()
 
-	list := collections.NewLinkedList()
+	list := collections.NewArrayList()
 	fmt.Println(list)
 	for i := 0; i < 20; i++ {
 		list.Add(i)
 		//fmt.Println(list)
 	}
 
-	_ = collections.LoopMutable(list, func(element interface{}, iterator collections.MutableIterator) error {
+	_ = collections.LoopMutable(list, func(element interface{}, iterator collections.MutableIterator) (err error) {
 		if element.(int)&1 == 0 {
-			iterator.Remove()
+			err = iterator.Remove()
 		}
 		fmt.Println(list)
-		return nil
+		return
 	})
 	//for i := 0; i < 10; i++ {
 	//	list.Remove(i * 2)

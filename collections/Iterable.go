@@ -12,7 +12,7 @@ type Iterable interface {
 type MutableIterator interface {
 	HasNext() bool
 	Next() (interface{}, error)
-	Remove() bool
+	Remove() error
 }
 
 type MutableIterable interface {
@@ -38,7 +38,7 @@ func Loop(iterable Iterable, f func(element interface{}) error) error {
 	return nil
 }
 
-func LoopMutable(iterable MutableIterable, f func(element interface{}, iterator MutableIterator) error) error {
+func LoopMutable(iterable MutableIterable, f func(element interface{}, iterator MutableIterator) (err error)) error {
 	if f == nil {
 		return nil
 	}

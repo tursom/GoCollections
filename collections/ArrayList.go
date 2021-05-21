@@ -14,6 +14,10 @@ func NewArrayList() *ArrayList {
 	}
 }
 
+func (a ArrayList) String() string {
+	return String(a)
+}
+
 func (a ArrayList) Iterator() Iterator {
 	return a.MutableIterator()
 }
@@ -32,10 +36,6 @@ func (a ArrayList) Contains(element interface{}) bool {
 
 func (a ArrayList) ContainsAll(c Collection) bool {
 	return ContainsAll(a, c)
-}
-
-func (a *ArrayList) MutableIterator() MutableIterator {
-	panic("implement me")
 }
 
 func (a *ArrayList) Add(element interface{}) bool {
@@ -59,24 +59,12 @@ func (a ArrayList) IndexOf(element interface{}) int {
 	return -1
 }
 
-func (a *ArrayList) RemoveIndex(index uint32) error {
-	if index >= a.used {
-		return exceptions.NewIndexOutOfBound("", true)
-	}
-
-	array := a.array
-	for i := index + 1; i < a.used; i++ {
-		array[index-1] = array[index]
-	}
-	return nil
-}
-
 func (a *ArrayList) Remove(element interface{}) error {
 	index := a.IndexOf(element)
 	if index < 0 {
 		return exceptions.NewElementNotFoundException("", true)
 	} else {
-		return a.RemoveIndex(uint32(index))
+		return a.RemoveAt(uint32(index))
 	}
 }
 
@@ -117,13 +105,63 @@ func (a *ArrayList) Set(index uint32, element interface{}) error {
 }
 
 func (a *ArrayList) AddAtIndex(index uint32, element interface{}) bool {
-	panic("implement me")
+	if !a.Add(element) {
+		return false
+	}
+
+	array := a.array
+	for i := a.used - 1; i > index; i++ {
+		array[i] = array[i-1]
+	}
+	array[index] = element
+	a.used++
+	return true
 }
 
-func (a *ArrayList) RemoveAt(index uint32) bool {
-	panic("implement me")
+func (a *ArrayList) RemoveAt(index uint32) error {
+	if index >= a.used {
+		return exceptions.NewIndexOutOfBound("", true)
+	}
+
+	array := a.array
+	for i := index + 1; i < a.used; i++ {
+		array[i-1] = array[i]
+	}
+	a.used--
+	return nil
 }
 
 func (a *ArrayList) SubMutableList(from, to uint32) MutableList {
 	panic("implement me")
+}
+
+func (a *ArrayList) MutableIterator() MutableIterator {
+	return &arrayListIterator{a, 0}
+}
+
+type arrayListIterator struct {
+	arrayList *ArrayList
+	index     uint32
+}
+
+func (a *arrayListIterator) HasNext() bool {
+	return a.index < a.arrayList.used
+}
+
+func (a *arrayListIterator) Next() (interface{}, error) {
+	value, err := a.arrayList.Get(a.index)
+	if err != nil {
+		return nil, err
+	}
+	a.index++
+	return value, nil
+}
+
+func (a *arrayListIterator) Remove() error {
+	err := a.arrayList.RemoveAt(a.index - 1)
+	if err != nil {
+		return err
+	}
+	a.index--
+	return nil
 }

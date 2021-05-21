@@ -112,17 +112,17 @@ func (l *LinkedList) AddAtIndex(index uint32, element interface{}) bool {
 	return false
 }
 
-func (l *LinkedList) RemoveAt(index uint32) bool {
+func (l *LinkedList) RemoveAt(index uint32) error {
 	node := l.head
 	for node != l.head {
 		if index == 0 {
 			l.size--
 			node.remove()
-			return true
+			return nil
 		}
 		index--
 	}
-	return false
+	return exceptions.NewIndexOutOfBound("", true)
 }
 
 func (l *LinkedList) SubMutableList(from, to uint32) MutableList {
@@ -166,13 +166,13 @@ func (l *linkedListIterator) Next() (interface{}, error) {
 	return l.node.prev.value, nil
 }
 
-func (l *linkedListIterator) Remove() bool {
+func (l *linkedListIterator) Remove() error {
 	if l.node.prev == l.head {
-		return false
+		return exceptions.NewIndexOutOfBound("", true)
 	}
 	l.node.prev.remove()
 	l.list.size--
-	return true
+	return nil
 }
 
 func (l *linkedListNode) remove() {

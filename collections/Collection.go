@@ -62,7 +62,7 @@ type (
 
 		Set(index uint32, element interface{}) error
 		AddAtIndex(index uint32, element interface{}) bool
-		RemoveAt(index uint32) bool
+		RemoveAt(index uint32) error
 		SubMutableList(from, to uint32) MutableList
 	}
 )
@@ -102,13 +102,12 @@ func RemoveAll(l MutableCollection, collection Collection) bool {
 }
 
 func RetainAll(l MutableCollection, collection Collection) bool {
-	_ = LoopMutable(l, func(element interface{}, iterator MutableIterator) error {
+	return LoopMutable(l, func(element interface{}, iterator MutableIterator) error {
 		if !collection.Contains(element) {
-			iterator.Remove()
+			return iterator.Remove()
 		}
 		return nil
-	})
-	return true
+	}) == nil
 }
 
 func String(l List) string {
