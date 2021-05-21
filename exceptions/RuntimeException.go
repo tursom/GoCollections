@@ -73,6 +73,7 @@ func (o RuntimeException) PrintStackTraceTo(writer io.Writer) {
 	for writeBytes < len(bytes) {
 		write, err := writer.Write(bytes[writeBytes:])
 		if err != nil {
+			Print(err)
 			return
 		}
 		writeBytes += write
@@ -80,7 +81,7 @@ func (o RuntimeException) PrintStackTraceTo(writer io.Writer) {
 }
 
 func (o RuntimeException) BuildPrintStackTrace(builder *strings.Builder) {
-	PrintStackTrace(builder, o, o.exceptionMessage)
+	BuildStackTrace(builder, o, o.exceptionMessage)
 	if o.cause != nil {
 		builder.WriteString("caused by: ")
 		o.cause.BuildPrintStackTrace(builder)

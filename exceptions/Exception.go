@@ -3,6 +3,7 @@ package exceptions
 import (
 	"fmt"
 	"io"
+	"os"
 	"strings"
 )
 
@@ -15,7 +16,36 @@ type Exception interface {
 	BuildPrintStackTrace(builder *strings.Builder)
 }
 
-func PrintStackTrace(builder *strings.Builder, e Exception, exceptionMsg string) {
+func PrintStackTraceByArray(writer io.Writer, trace []StackTrace) {
+	if trace == nil {
+		return
+	}
+	builder := &strings.Builder{}
+	for _, stackTrace := range trace {
+		stackTrace.WriteTo(builder)
+	}
+	bytes := []byte(builder.String())
+	writeBytes := 0
+	for writeBytes < len(bytes) {
+		write, err := writer.Write(bytes[writeBytes:])
+		if err != nil {
+			Print(err)
+			return
+		}
+		writeBytes += write
+	}
+}
+
+func BuildStackTraceByArray(builder *strings.Builder, trace []StackTrace) {
+	if trace == nil {
+		return
+	}
+	for _, stackTrace := range trace {
+		stackTrace.WriteTo(builder)
+	}
+}
+
+func BuildStackTrace(builder *strings.Builder, e Exception, exceptionMsg string) {
 	builder.WriteString(fmt.Sprintln(exceptionMsg, e.Error()))
 	if e.StackTrace() == nil {
 		return
@@ -39,4 +69,16 @@ func Try(
 		ret, err = catch(err)
 	}
 	return
+}
+
+func Print(err error) {
+	if err == nil {
+		return
+	}
+	switch err.(type) {
+	case Exception:
+		err.(Exception).PrintStackTrace()
+	default:
+		_, _ = fmt.Fprintln(os.Stderr, err)
+	}
 }
