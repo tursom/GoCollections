@@ -2,7 +2,7 @@ package collections
 
 type Iterator interface {
 	HasNext() bool
-	Next() interface{}
+	Next() (interface{}, error)
 }
 
 type Iterable interface {
@@ -11,7 +11,7 @@ type Iterable interface {
 
 type MutableIterator interface {
 	HasNext() bool
-	Next() interface{}
+	Next() (interface{}, error)
 	Remove() bool
 }
 
@@ -26,7 +26,11 @@ func Loop(iterable Iterable, f func(element interface{}) error) error {
 	}
 	iterator := iterable.Iterator()
 	for iterator.HasNext() {
-		err := f(iterator.Next())
+		next, err := iterator.Next()
+		if err != nil {
+			return err
+		}
+		err = f(next)
 		if err != nil {
 			return err
 		}
@@ -40,7 +44,11 @@ func LoopMutable(iterable MutableIterable, f func(element interface{}, iterator 
 	}
 	iterator := iterable.MutableIterator()
 	for iterator.HasNext() {
-		err := f(iterator.Next(), iterator)
+		next, err := iterator.Next()
+		if err != nil {
+			return err
+		}
+		err = f(next, iterator)
 		if err != nil {
 			return err
 		}

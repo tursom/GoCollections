@@ -2,10 +2,18 @@ package main
 
 import (
 	"collections/collections"
+	"collections/exceptions"
 	"fmt"
 )
 
 func main() {
+	fmt.Println(exceptions.Try(func() (interface{}, error) {
+		panic("test")
+	}, func(r interface{}) interface{} {
+		fmt.Println("recover from panic", r)
+		return exceptions.NewIndexOutOfBound("", true)
+	}))
+
 	list := collections.NewLinkedList()
 	fmt.Println(list)
 	for i := 0; i < 20; i++ {

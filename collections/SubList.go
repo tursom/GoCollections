@@ -12,7 +12,10 @@ func NewSubList(list List, from, to uint32) *SubList {
 func (s *SubList) Iterator() Iterator {
 	iterator := s.list.Iterator()
 	for i := 0; i < int(s.from); i++ {
-		iterator.Next()
+		_, err := iterator.Next()
+		if err != nil {
+			return nil
+		}
 	}
 	return iterator
 }

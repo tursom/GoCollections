@@ -1,5 +1,7 @@
 package collections
 
+import "collections/exceptions"
+
 type MutableSubList struct {
 	list     MutableList
 	from, to uint32
@@ -12,7 +14,10 @@ func NewMutableSubList(list MutableList, from, to uint32) *MutableSubList {
 func (s *MutableSubList) Iterator() Iterator {
 	iterator := s.list.Iterator()
 	for i := 0; i < int(s.from); i++ {
-		iterator.Next()
+		_, err := iterator.Next()
+		if err != nil {
+			return nil
+		}
 	}
 	return iterator
 }
@@ -45,41 +50,41 @@ func (s *MutableSubList) MutableIterator() MutableIterator {
 	return nil
 }
 
-func (s *MutableSubList) Add(element interface{}) bool {
+func (s *MutableSubList) Add(_ interface{}) bool {
 	return false
 }
 
-func (s *MutableSubList) Remove(element interface{}) bool {
+func (s *MutableSubList) Remove(element interface{}) error {
+	return nil
+}
+
+func (s *MutableSubList) AddAll(_ Collection) bool {
 	return false
 }
 
-func (s *MutableSubList) AddAll(c Collection) bool {
+func (s *MutableSubList) RemoveAll(_ Collection) bool {
 	return false
 }
 
-func (s *MutableSubList) RemoveAll(c Collection) bool {
-	return false
-}
-
-func (s *MutableSubList) RetainAll(c Collection) bool {
+func (s *MutableSubList) RetainAll(_ Collection) bool {
 	return false
 }
 
 func (s *MutableSubList) Clear() {
 }
 
-func (s *MutableSubList) Set(index uint32, element interface{}) bool {
+func (s *MutableSubList) Set(index uint32, element interface{}) error {
 	if index >= s.to-s.from {
-		return false
+		return exceptions.NewIndexOutOfBound("", true)
 	}
 	return s.list.Set(index+s.from, element)
 }
 
-func (s *MutableSubList) AddAtIndex(index uint32, element interface{}) bool {
+func (s *MutableSubList) AddAtIndex(_ uint32, _ interface{}) bool {
 	return false
 }
 
-func (s *MutableSubList) RemoveAt(index uint32) bool {
+func (s *MutableSubList) RemoveAt(_ uint32) bool {
 	return false
 }
 

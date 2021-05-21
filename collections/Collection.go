@@ -24,7 +24,7 @@ type (
 
 		MutableIterator() MutableIterator
 		Add(element interface{}) bool
-		Remove(element interface{}) bool
+		Remove(element interface{}) error
 		AddAll(c Collection) bool
 		RemoveAll(c Collection) bool
 		RetainAll(c Collection) bool
@@ -51,7 +51,7 @@ type (
 
 		MutableIterator() MutableIterator
 		Add(element interface{}) bool
-		Remove(element interface{}) bool
+		Remove(element interface{}) error
 		AddAll(c Collection) bool
 		RemoveAll(c Collection) bool
 		RetainAll(c Collection) bool
@@ -60,7 +60,7 @@ type (
 		Get(index uint32) (interface{}, error)
 		SubList(from, to uint32) List
 
-		Set(index uint32, element interface{}) bool
+		Set(index uint32, element interface{}) error
 		AddAtIndex(index uint32, element interface{}) bool
 		RemoveAt(index uint32) bool
 		SubMutableList(from, to uint32) MutableList
@@ -97,10 +97,7 @@ func AddAll(l MutableCollection, collection Collection) bool {
 
 func RemoveAll(l MutableCollection, collection Collection) bool {
 	return Loop(collection, func(e interface{}) error {
-		if !l.Remove(e) {
-			return exceptions.CollectionLoopFinished
-		}
-		return nil
+		return l.Remove(e)
 	}) == nil
 }
 
@@ -122,11 +119,11 @@ func String(l List) string {
 	builder := strings.Builder{}
 	builder.WriteString("[")
 	iterator := l.Iterator()
-	next := iterator.Next()
+	next, _ := iterator.Next()
 	builder.WriteString(fmt.Sprint(next))
 	for iterator.HasNext() {
 		builder.WriteString(", ")
-		next = iterator.Next()
+		next, _ = iterator.Next()
 		builder.WriteString(fmt.Sprint(next))
 	}
 	builder.WriteString("]")

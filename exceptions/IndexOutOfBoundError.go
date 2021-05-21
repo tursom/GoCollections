@@ -1,7 +1,6 @@
 package exceptions
 
 import (
-	"fmt"
 	"io"
 	"os"
 )
@@ -31,16 +30,7 @@ func (i IndexOutOfBound) PrintStackTrace() {
 }
 
 func (i IndexOutOfBound) PrintStackTraceTo(writer io.Writer) {
-	_, err := fmt.Fprintln(writer, "exception caused IndexOutOfBound:", i.Error())
-	if err != nil {
-		return
-	}
-	if i.stackTrace == nil {
-		return
-	}
-	for _, stackTrace := range i.stackTrace {
-		stackTrace.PrintLn(writer)
-	}
+	PrintStackTrace(writer, i, "exception caused IndexOutOfBound:")
 }
 
 func (i IndexOutOfBound) Error() string {

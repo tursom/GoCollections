@@ -50,14 +50,19 @@ func (l *LinkedList) Add(element interface{}) bool {
 	return true
 }
 
-func (l *LinkedList) Remove(element interface{}) bool {
-	return LoopMutable(l, func(e interface{}, iterator MutableIterator) error {
+func (l *LinkedList) Remove(element interface{}) error {
+	err := LoopMutable(l, func(e interface{}, iterator MutableIterator) error {
 		if element == e {
 			iterator.Remove()
 			return exceptions.CollectionLoopFinished
 		}
 		return nil
-	}) != nil
+	})
+	if err != nil {
+		return nil
+	} else {
+		return exceptions.NewElementNotFoundException("", true)
+	}
 }
 
 func (l *LinkedList) AddAll(c Collection) bool {
@@ -81,16 +86,16 @@ func (l LinkedList) SubList(from, to uint32) List {
 	return NewSubList(l, from, to)
 }
 
-func (l *LinkedList) Set(index uint32, element interface{}) bool {
+func (l *LinkedList) Set(index uint32, element interface{}) error {
 	node := l.head
 	for node != l.head {
 		if index == 0 {
 			node.value = element
-			return true
+			return nil
 		}
 		index--
 	}
-	return false
+	return exceptions.NewIndexOutOfBound("", true)
 }
 
 func (l *LinkedList) AddAtIndex(index uint32, element interface{}) bool {
@@ -153,12 +158,12 @@ func (l *linkedListIterator) HasNext() bool {
 	return l.node != l.head
 }
 
-func (l *linkedListIterator) Next() interface{} {
+func (l *linkedListIterator) Next() (interface{}, error) {
 	if l.node == l.head {
-		panic("iterator loop finished")
+		return nil, exceptions.NewIndexOutOfBound("", true)
 	}
 	l.node = l.node.next
-	return l.node.prev.value
+	return l.node.prev.value, nil
 }
 
 func (l *linkedListIterator) Remove() bool {
