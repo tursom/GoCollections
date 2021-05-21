@@ -80,5 +80,6 @@ func Print(err error) {
 		err.(Exception).PrintStackTrace()
 	default:
 		_, _ = fmt.Fprintln(os.Stderr, err)
+		PrintStackTraceByArray(os.Stderr, GetStackTrace())
 	}
 }
