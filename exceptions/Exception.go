@@ -83,3 +83,10 @@ func Print(err error) {
 		PrintStackTraceByArray(os.Stderr, GetStackTrace())
 	}
 }
+
+func Package(err error) Exception {
+	if err == nil {
+		return nil
+	}
+	return NewRuntimeException(err, "", true, err)
+}

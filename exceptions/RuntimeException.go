@@ -14,14 +14,6 @@ type RuntimeException struct {
 	cause            Exception
 }
 
-func Package(err error) *RuntimeException {
-	if err == nil {
-		return nil
-	}
-	runtimeException := NewRuntimeException(err, "", true, err)
-	return &runtimeException
-}
-
 func NewRuntimeException(message interface{}, exceptionMessage string, getStackTrace bool, cause interface{}) RuntimeException {
 	var stackTrace []StackTrace = nil
 	if getStackTrace {
