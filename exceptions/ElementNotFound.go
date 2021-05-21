@@ -6,6 +6,11 @@ type ElementNotFoundException struct {
 
 func NewElementNotFoundException(message string, getStackTrace bool) *ElementNotFoundException {
 	return &ElementNotFoundException{
-		NewRuntimeException(message, "exception caused ElementNotFoundException:", getStackTrace),
+		NewRuntimeException(
+			message,
+			"exception caused ElementNotFoundException:",
+			getStackTrace,
+			nil,
+		),
 	}
 }

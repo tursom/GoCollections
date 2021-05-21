@@ -6,6 +6,11 @@ type IndexOutOfBound struct {
 
 func NewIndexOutOfBound(message string, getStackTrace bool) IndexOutOfBound {
 	return IndexOutOfBound{
-		NewRuntimeException(message, "exception caused IndexOutOfBound:", getStackTrace),
+		NewRuntimeException(
+			message,
+			"exception caused IndexOutOfBound:",
+			getStackTrace,
+			nil,
+		),
 	}
 }

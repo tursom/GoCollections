@@ -6,6 +6,11 @@ type OperationNotSupportedException struct {
 
 func NewOperationNotSupportedException(message string, getStackTrace bool) OperationNotSupportedException {
 	return OperationNotSupportedException{
-		NewRuntimeException(message, "exception caused OperationNotSupportedException:", getStackTrace),
+		NewRuntimeException(
+			message,
+			"exception caused OperationNotSupportedException:",
+			getStackTrace,
+			nil,
+		),
 	}
 }

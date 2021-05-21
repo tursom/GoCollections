@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"runtime"
+	"strings"
 )
 
 type StackTrace struct {
@@ -36,6 +37,10 @@ func (s StackTrace) PrintLn(writer io.Writer) {
 	if err != nil {
 		return
 	}
+}
+
+func (s StackTrace) WriteTo(builder *strings.Builder) {
+	builder.WriteString(fmt.Sprintf("\tat %s(%d)\n", s.file, s.line))
 }
 
 func GetStackTrace() []StackTrace {

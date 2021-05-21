@@ -1,5 +1,7 @@
 package collections
 
+import "github.com/tursom/GoCollections/exceptions"
+
 type Iterator interface {
 	HasNext() bool
 	Next() (interface{}, error)
@@ -22,7 +24,7 @@ type MutableIterable interface {
 
 func Loop(iterable Iterable, f func(element interface{}) error) error {
 	if f == nil {
-		return nil
+		return exceptions.NewNPE("", true)
 	}
 	iterator := iterable.Iterator()
 	for iterator.HasNext() {

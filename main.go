@@ -13,7 +13,13 @@ func main() {
 		fmt.Println("recover from panic", r)
 		return nil, exceptions.NewIndexOutOfBound(fmt.Sprint(r), true)
 	})
-	err.(exceptions.Exception).PrintStackTrace()
+	exception := err.(exceptions.Exception)
+	exceptions.NewRuntimeException(
+		exception.Error(),
+		"test exception:",
+		true,
+		exception,
+	).PrintStackTrace()
 
 	list := collections.NewArrayList()
 	fmt.Println(list)
