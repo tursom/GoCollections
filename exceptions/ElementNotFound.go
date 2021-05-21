@@ -4,7 +4,7 @@ type ElementNotFoundException struct {
 	RuntimeException
 }
 
-func NewElementNotFoundException(message string, getStackTrace bool) *ElementNotFoundException {
+func NewElementNotFoundException(message interface{}, getStackTrace bool) *ElementNotFoundException {
 	return &ElementNotFoundException{
 		NewRuntimeException(
 			message,

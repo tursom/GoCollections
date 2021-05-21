@@ -1,6 +1,7 @@
 package exceptions
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -13,7 +14,7 @@ type RuntimeException struct {
 	cause            Exception
 }
 
-func NewRuntimeException(message, exceptionMessage string, getStackTrace bool, cause interface{}) RuntimeException {
+func NewRuntimeException(message interface{}, exceptionMessage string, getStackTrace bool, cause interface{}) RuntimeException {
 	var stackTrace []StackTrace = nil
 	if getStackTrace {
 		stackTrace = GetStackTrace()
@@ -24,13 +25,20 @@ func NewRuntimeException(message, exceptionMessage string, getStackTrace bool, c
 	}
 
 	var causeException Exception = nil
-	switch cause.(type) {
-	case Exception:
-		causeException = cause.(Exception)
+	if cause != nil {
+		switch cause.(type) {
+		case Exception:
+			causeException = cause.(Exception)
+		default:
+			causeException = RuntimeException{
+				message:          fmt.Sprint(cause),
+				exceptionMessage: "exception caused:",
+			}
+		}
 	}
 
 	return RuntimeException{
-		message:          message,
+		message:          fmt.Sprint(message),
 		exceptionMessage: exceptionMessage,
 		stackTrace:       stackTrace,
 		cause:            causeException,

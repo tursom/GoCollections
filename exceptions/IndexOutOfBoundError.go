@@ -4,7 +4,7 @@ type IndexOutOfBound struct {
 	RuntimeException
 }
 
-func NewIndexOutOfBound(message string, getStackTrace bool) IndexOutOfBound {
+func NewIndexOutOfBound(message interface{}, getStackTrace bool) IndexOutOfBound {
 	return IndexOutOfBound{
 		NewRuntimeException(
 			message,

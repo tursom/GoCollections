@@ -4,7 +4,7 @@ type OperationNotSupportedException struct {
 	RuntimeException
 }
 
-func NewOperationNotSupportedException(message string, getStackTrace bool) OperationNotSupportedException {
+func NewOperationNotSupportedException(message interface{}, getStackTrace bool) OperationNotSupportedException {
 	return OperationNotSupportedException{
 		NewRuntimeException(
 			message,

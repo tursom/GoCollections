@@ -4,7 +4,7 @@ type NPE struct {
 	RuntimeException
 }
 
-func NewNPE(message string, getStackTrace bool) *NPE {
+func NewNPE(message interface{}, getStackTrace bool) *NPE {
 	return &NPE{
 		NewRuntimeException(
 			message,
