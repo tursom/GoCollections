@@ -1,9 +1,9 @@
 package main
 
 import (
-	"collections/collections"
-	"collections/exceptions"
 	"fmt"
+	"github.com/tursom/GoCollections/collections"
+	"github.com/tursom/GoCollections/exceptions"
 )
 
 func main() {

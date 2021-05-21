@@ -1,6 +1,6 @@
 package collections
 
-import "collections/exceptions"
+import "github.com/tursom/GoCollections/exceptions"
 
 type MutableSubList struct {
 	list     MutableList

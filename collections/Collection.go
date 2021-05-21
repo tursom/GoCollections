@@ -1,8 +1,8 @@
 package collections
 
 import (
-	"collections/exceptions"
 	"fmt"
+	"github.com/tursom/GoCollections/exceptions"
 	"strings"
 )
 

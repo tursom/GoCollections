@@ -1,7 +1,7 @@
 package collections
 
 import (
-	"collections/exceptions"
+	"github.com/tursom/GoCollections/exceptions"
 )
 
 type (
