@@ -67,15 +67,6 @@ type (
 	}
 )
 
-func Contains(l Collection, element interface{}) bool {
-	return Loop(l, func(e interface{}) exceptions.Exception {
-		if e == element {
-			return exceptions.ElementFound
-		}
-		return nil
-	}) != nil
-}
-
 func ContainsAll(l Collection, collection Collection) bool {
 	return Loop(collection, func(e interface{}) exceptions.Exception {
 		if l.Contains(e) {
@@ -90,21 +81,6 @@ func AddAll(l MutableCollection, collection Collection) bool {
 	return Loop(collection, func(e interface{}) exceptions.Exception {
 		if !l.Add(e) {
 			return exceptions.CollectionLoopFinished
-		}
-		return nil
-	}) == nil
-}
-
-func RemoveAll(l MutableCollection, collection Collection) bool {
-	return Loop(collection, func(e interface{}) exceptions.Exception {
-		return l.Remove(e)
-	}) == nil
-}
-
-func RetainAll(l MutableCollection, collection Collection) bool {
-	return LoopMutable(l, func(element interface{}, iterator MutableIterator) exceptions.Exception {
-		if !collection.Contains(element) {
-			return iterator.Remove()
 		}
 		return nil
 	}) == nil
