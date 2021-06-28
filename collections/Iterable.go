@@ -29,7 +29,10 @@ func Loop(iterable Iterable, f func(element interface{}) exceptions.Exception) e
 	return LoopIterator(iterable.Iterator(), f)
 }
 
-func LoopMutable(iterable MutableIterable, f func(element interface{}, iterator MutableIterator) (err exceptions.Exception)) exceptions.Exception {
+func LoopMutable(
+	iterable MutableIterable,
+	f func(element interface{}, iterator MutableIterator) (err exceptions.Exception),
+) exceptions.Exception {
 	if f == nil || iterable == nil {
 		return exceptions.NewNPE("", true)
 	}
@@ -53,7 +56,10 @@ func LoopIterator(iterator Iterator, f func(element interface{}) exceptions.Exce
 	return nil
 }
 
-func LoopMutableIterator(iterator MutableIterator, f func(element interface{}, iterator MutableIterator) (err exceptions.Exception)) exceptions.Exception {
+func LoopMutableIterator(
+	iterator MutableIterator,
+	f func(element interface{}, iterator MutableIterator) (err exceptions.Exception),
+) exceptions.Exception {
 	if f == nil || iterator == nil {
 		return exceptions.NewNPE("", true)
 	}
