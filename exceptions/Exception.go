@@ -106,3 +106,20 @@ func PackageAny(err interface{}) Exception {
 		return NewRuntimeException(err, "", true, nil)
 	}
 }
+
+func PackagePanic(panic interface{}) Exception {
+	switch panic.(type) {
+	case error:
+		return NewRuntimeException(
+			panic,
+			"an panic caused on handle WebSocket message:",
+			true, panic,
+		)
+	default:
+		return NewRuntimeException(
+			panic,
+			"an panic caused on handle WebSocket message:",
+			true, nil,
+		)
+	}
+}
