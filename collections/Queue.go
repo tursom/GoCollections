@@ -6,7 +6,7 @@ type Queue interface {
 	// Iterator MutableIterable
 	Iterator() Iterator
 	// MutableIterator MutableIterable
-	MutableIterator() MutableIterator
+	MutableIterator() *linkedListIterator
 
 	Push(element interface{}) exceptions.Exception
 	Offer() (interface{}, exceptions.Exception)
