@@ -108,6 +108,9 @@ func PackageAny(err interface{}) Exception {
 }
 
 func PackagePanic(panic interface{}) Exception {
+	if panic == nil {
+		return nil
+	}
 	switch panic.(type) {
 	case error:
 		return NewRuntimeException(
