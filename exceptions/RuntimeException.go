@@ -30,10 +30,7 @@ func NewRuntimeException(message interface{}, exceptionMessage string, getStackT
 		case Exception:
 			causeException = cause.(Exception)
 		default:
-			causeException = RuntimeException{
-				message:          fmt.Sprint(cause),
-				exceptionMessage: "exception caused:",
-			}
+			causeException = NewPackageException(cause, "exception caused:", false)
 		}
 	}
 
