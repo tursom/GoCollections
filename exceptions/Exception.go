@@ -107,7 +107,7 @@ func PackageAny(err interface{}) Exception {
 	}
 }
 
-func PackagePanic(panic interface{}) Exception {
+func PackagePanic(panic interface{}, exceptionMessage string) Exception {
 	if panic == nil {
 		return nil
 	}
@@ -115,13 +115,13 @@ func PackagePanic(panic interface{}) Exception {
 	case error:
 		return NewRuntimeException(
 			panic,
-			"an panic caused on handle WebSocket message:",
+			exceptionMessage,
 			true, panic,
 		)
 	default:
 		return NewRuntimeException(
 			panic,
-			"an panic caused on handle WebSocket message:",
+			exceptionMessage,
 			true, nil,
 		)
 	}
