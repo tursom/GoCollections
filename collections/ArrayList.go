@@ -14,6 +14,13 @@ func NewArrayList() *ArrayList {
 	}
 }
 
+func NewArrayListByCapacity(cap uint32) *ArrayList {
+	return &ArrayList{
+		make([]interface{}, cap),
+		0,
+	}
+}
+
 func (a ArrayList) String() string {
 	return String(a)
 }
