@@ -1,17 +1,20 @@
 package collections
 
-import "github.com/tursom/GoCollections/exceptions"
+import (
+	"github.com/tursom/GoCollections/exceptions"
+	"github.com/tursom/GoCollections/lang"
+)
 
-type SubList struct {
-	list     List
-	from, to uint32
+type SubList[T lang.Object] struct {
+	list     List[T]
+	from, to int
 }
 
-func NewSubList(list List, from, to uint32) *SubList {
-	return &SubList{list, from, to}
+func NewSubList[T lang.Object](list List[T], from, to int) List[T] {
+	return &SubList[T]{list, from, to}
 }
 
-func (s *SubList) Iterator() Iterator {
+func (s *SubList[T]) Iterator() Iterator[T] {
 	iterator := s.list.Iterator()
 	for i := 0; i < int(s.from); i++ {
 		_, err := iterator.Next()
@@ -22,26 +25,26 @@ func (s *SubList) Iterator() Iterator {
 	return iterator
 }
 
-func (s *SubList) Size() uint32 {
+func (s *SubList[T]) Size() int {
 	return s.to - s.from
 }
 
-func (s *SubList) IsEmpty() bool {
+func (s *SubList[T]) IsEmpty() bool {
 	return s.Size() == 0
 }
 
-func (s *SubList) Contains(element interface{}) bool {
-	return Contains(s, element)
+func (s *SubList[T]) Contains(element T) bool {
+	return Contains[T](s, element)
 }
 
-func (s *SubList) ContainsAll(c Collection) bool {
-	return ContainsAll(s, c)
+func (s *SubList[T]) ContainsAll(c Collection[T]) bool {
+	return ContainsAll[T](s, c)
 }
 
-func (s *SubList) Get(index uint32) (interface{}, exceptions.Exception) {
+func (s *SubList[T]) Get(index int) (T, exceptions.Exception) {
 	return s.list.Get(index + s.from)
 }
 
-func (s *SubList) SubList(from, to uint32) List {
-	return NewSubList(s, from, to)
+func (s *SubList[T]) SubList(from, to int) List[T] {
+	return NewSubList[T](s, from, to)
 }

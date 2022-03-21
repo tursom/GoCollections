@@ -92,7 +92,7 @@ func Package(err error) Exception {
 	case Exception:
 		return err.(Exception)
 	}
-	return NewRuntimeException(err, "", true, err)
+	return NewRuntimeException(err, "", DefaultExceptionConfig().SetCause(err))
 }
 
 func PackageAny(err interface{}) Exception {
@@ -103,7 +103,7 @@ func PackageAny(err interface{}) Exception {
 	case error:
 		return Package(err.(error))
 	default:
-		return NewRuntimeException(err, "", true, nil)
+		return NewRuntimeException(err, "", DefaultExceptionConfig())
 	}
 }
 
@@ -116,13 +116,13 @@ func PackagePanic(panic interface{}, exceptionMessage string) Exception {
 		return NewRuntimeException(
 			panic,
 			exceptionMessage,
-			true, panic,
+			DefaultExceptionConfig().SetCause(panic),
 		)
 	default:
 		return NewRuntimeException(
 			panic,
 			exceptionMessage,
-			true, nil,
+			DefaultExceptionConfig(),
 		)
 	}
 }

@@ -4,13 +4,13 @@ type ElementNotFoundException struct {
 	RuntimeException
 }
 
-func NewElementNotFoundException(message interface{}, getStackTrace bool) ElementNotFoundException {
-	return ElementNotFoundException{
+func NewElementNotFoundException(message interface{}, config *ExceptionConfig) *ElementNotFoundException {
+	config.AddSkipStack(1)
+	return &ElementNotFoundException{
 		NewRuntimeException(
 			message,
 			"exception caused ElementNotFoundException:",
-			getStackTrace,
-			nil,
+			config,
 		),
 	}
 }

@@ -44,22 +44,17 @@ func (s StackTrace) WriteTo(builder *strings.Builder) {
 }
 
 func GetStackTrace() []StackTrace {
-	stackTraceMax := 16
-	stackTraceUsed := 0
-	stackTrace := make([]StackTrace, stackTraceMax)
-	for i := 1; ; i++ {
+	return GetStackTraceSkipDeep(0)
+}
+
+func GetStackTraceSkipDeep(deep int) []StackTrace {
+	stackTrace := make([]StackTrace, 0, 16)
+	for i := deep + 1; ; i++ {
 		pc, file, line, ok := runtime.Caller(i)
 		if !ok {
 			break
 		}
-		if stackTraceUsed == stackTraceMax {
-			stackTraceMax *= 2
-			stackTraceOld := stackTrace
-			stackTrace = make([]StackTrace, stackTraceMax)
-			copy(stackTrace, stackTraceOld)
-		}
-		stackTrace[stackTraceUsed] = StackTrace{pc, file, line}
-		stackTraceUsed++
+		stackTrace = append(stackTrace, StackTrace{pc, file, line})
 	}
-	return stackTrace[0:stackTraceUsed]
+	return stackTrace
 }

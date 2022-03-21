@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/tursom/GoCollections/collections"
 	"github.com/tursom/GoCollections/exceptions"
+	"github.com/tursom/GoCollections/lang"
 	"time"
 )
 
@@ -16,24 +17,24 @@ func main() {
 	})
 	exceptions.Print(err)
 
-	list := collections.NewConcurrentLinkedQueue()
-	target := collections.NewArrayListByCapacity(10000)
+	list := collections.NewConcurrentLinkedQueue[lang.Int]()
+	target := collections.NewArrayListByCapacity[lang.Int](10000)
 	fmt.Println("list", list)
 
 	go func() {
 		for i := 0; i < 1000000; i++ {
-			element, _ := list.Offer()
+			list.Offer()
 			//fmt.Println(offer)
-			if element != nil {
-				target.Add(element)
-			}
+			//if element != nil {
+			//	target.Add(element)
+			//}
 		}
 		fmt.Println("target:", target)
 	}()
 
 	go func() {
 		for i := 0; i < 1000; i++ {
-			err = list.Push(i)
+			err = list.Push(lang.Int(i))
 			//fmt.Println(err)
 		}
 		time.Sleep(time.Second * 2)

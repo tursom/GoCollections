@@ -2,12 +2,12 @@ package collections
 
 import "github.com/tursom/GoCollections/exceptions"
 
-type Stack interface {
+type Stack[T any] interface {
 	// Iterator MutableIterable
-	Iterator() Iterator
+	Iterator() Iterator[T]
 	// MutableIterator MutableIterable
-	MutableIterator() MutableIterator
+	MutableIterator() MutableIterator[T]
 
-	Push(element interface{}) exceptions.Exception
-	Pop() (interface{}, exceptions.Exception)
+	Push(element T) exceptions.Exception
+	Pop() (T, exceptions.Exception)
 }

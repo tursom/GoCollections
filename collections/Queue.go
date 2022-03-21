@@ -1,13 +1,16 @@
 package collections
 
-import "github.com/tursom/GoCollections/exceptions"
+import (
+	"github.com/tursom/GoCollections/exceptions"
+	"github.com/tursom/GoCollections/lang"
+)
 
-type Queue interface {
+type Queue[T lang.Object] interface {
 	// Iterator MutableIterable
-	Iterator() Iterator
+	Iterator() Iterator[T]
 	// MutableIterator MutableIterable
-	MutableIterator() *linkedListIterator
+	MutableIterator() *linkedListIterator[T]
 
-	Push(element interface{}) exceptions.Exception
-	Offer() (interface{}, exceptions.Exception)
+	Push(element T) exceptions.Exception
+	Offer() (T, exceptions.Exception)
 }

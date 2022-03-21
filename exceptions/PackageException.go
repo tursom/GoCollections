@@ -5,9 +5,10 @@ type PackageException struct {
 	err interface{}
 }
 
-func NewPackageException(err interface{}, exceptionMessage string, getStackTrace bool) *PackageException {
+func NewPackageException(err interface{}, exceptionMessage string, config *ExceptionConfig) *PackageException {
+	config.AddSkipStack(1)
 	return &PackageException{
-		RuntimeException: NewRuntimeException(err, exceptionMessage, getStackTrace, nil),
+		RuntimeException: NewRuntimeException(err, exceptionMessage, config),
 		err:              err,
 	}
 }

@@ -3,72 +3,73 @@ package collections
 import (
 	"fmt"
 	"github.com/tursom/GoCollections/exceptions"
+	"github.com/tursom/GoCollections/lang"
 	"strings"
 )
 
 type (
-	Collection interface {
-		Iterator() Iterator
-		Size() uint32
+	Collection[T any] interface {
+		Iterator() Iterator[T]
+		Size() int
 		IsEmpty() bool
-		Contains(element interface{}) bool
-		ContainsAll(c Collection) bool
+		Contains(element T) bool
+		ContainsAll(c Collection[T]) bool
 	}
 
-	MutableCollection interface {
-		Iterator() Iterator
-		Size() uint32
+	MutableCollection[T any] interface {
+		Iterator() Iterator[T]
+		Size() int
 		IsEmpty() bool
-		Contains(element interface{}) bool
-		ContainsAll(c Collection) bool
+		Contains(element T) bool
+		ContainsAll(c Collection[T]) bool
 
-		MutableIterator() MutableIterator
-		Add(element interface{}) bool
-		Remove(element interface{}) exceptions.Exception
-		AddAll(c Collection) bool
-		RemoveAll(c Collection) bool
-		RetainAll(c Collection) bool
+		MutableIterator() MutableIterator[T]
+		Add(element T) bool
+		Remove(element T) exceptions.Exception
+		AddAll(c Collection[T]) bool
+		RemoveAll(c Collection[T]) bool
+		RetainAll(c Collection[T]) bool
 		Clear()
 	}
 
-	List interface {
-		Iterator() Iterator
-		Size() uint32
+	List[T any] interface {
+		Iterator() Iterator[T]
+		Size() int
 		IsEmpty() bool
-		Contains(element interface{}) bool
-		ContainsAll(c Collection) bool
+		Contains(element T) bool
+		ContainsAll(c Collection[T]) bool
 
-		Get(index uint32) (interface{}, exceptions.Exception)
-		SubList(from, to uint32) List
+		Get(index int) (T, exceptions.Exception)
+		SubList(from, to int) List[T]
 	}
 
-	MutableList interface {
-		Iterator() Iterator
-		Size() uint32
+	MutableList[T any] interface {
+		Iterator() Iterator[T]
+		Size() int
 		IsEmpty() bool
-		Contains(element interface{}) bool
-		ContainsAll(c Collection) bool
+		Contains(element T) bool
+		ContainsAll(c Collection[T]) bool
 
-		MutableIterator() MutableIterator
-		Add(element interface{}) bool
-		Remove(element interface{}) exceptions.Exception
-		AddAll(c Collection) bool
-		RemoveAll(c Collection) bool
-		RetainAll(c Collection) bool
+		MutableIterator() MutableIterator[T]
+		Add(element T) bool
+		Remove(element T) exceptions.Exception
+		AddAll(c Collection[T]) bool
+		RemoveAll(c Collection[T]) bool
+		RetainAll(c Collection[T]) bool
 		Clear()
 
-		Get(index uint32) (interface{}, exceptions.Exception)
-		SubList(from, to uint32) List
+		Get(index int) (T, exceptions.Exception)
+		SubList(from, to int) List[T]
 
-		Set(index uint32, element interface{}) exceptions.Exception
-		AddAtIndex(index uint32, element interface{}) bool
-		RemoveAt(index uint32) exceptions.Exception
-		SubMutableList(from, to uint32) MutableList
+		Set(index int, element T) exceptions.Exception
+		AddAtIndex(index int, element T) bool
+		RemoveAt(index int) exceptions.Exception
+		SubMutableList(from, to int) MutableList[T]
 	}
 )
 
-func ContainsAll(l Collection, collection Collection) bool {
-	return Loop(collection, func(e interface{}) exceptions.Exception {
+func ContainsAll[T lang.Object](l Collection[T], collection Collection[T]) bool {
+	return Loop[T](collection, func(e T) exceptions.Exception {
 		if l.Contains(e) {
 			return nil
 		} else {
@@ -77,8 +78,8 @@ func ContainsAll(l Collection, collection Collection) bool {
 	}) == nil
 }
 
-func AddAll(l MutableCollection, collection Collection) bool {
-	return Loop(collection, func(e interface{}) exceptions.Exception {
+func AddAll[T any](l MutableCollection[T], collection Collection[T]) bool {
+	return Loop[T](collection, func(e T) exceptions.Exception {
 		if !l.Add(e) {
 			return exceptions.CollectionLoopFinished
 		}
@@ -86,7 +87,7 @@ func AddAll(l MutableCollection, collection Collection) bool {
 	}) == nil
 }
 
-func String(l Iterable) string {
+func String[T any](l Iterable[T]) string {
 	iterator := l.Iterator()
 	if !iterator.HasNext() {
 		return "[]"

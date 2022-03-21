@@ -14,10 +14,14 @@ type RuntimeException struct {
 	cause            Exception
 }
 
-func NewRuntimeException(message interface{}, exceptionMessage string, getStackTrace bool, cause interface{}) RuntimeException {
+func NewRuntimeException(message interface{}, exceptionMessage string, config *ExceptionConfig) RuntimeException {
+	if config == nil {
+		config = DefaultExceptionConfig()
+	}
+
 	var stackTrace []StackTrace = nil
-	if getStackTrace {
-		stackTrace = GetStackTrace()
+	if config.GetStackTrace {
+		stackTrace = GetStackTraceSkipDeep(config.SkipStack + 1)
 	}
 
 	if len(exceptionMessage) == 0 {
@@ -25,12 +29,13 @@ func NewRuntimeException(message interface{}, exceptionMessage string, getStackT
 	}
 
 	var causeException Exception = nil
-	if cause != nil {
-		switch cause.(type) {
+	if config.Cause != nil {
+		switch config.Cause.(type) {
 		case Exception:
-			causeException = cause.(Exception)
+			causeException = config.Cause.(Exception)
 		default:
-			causeException = NewPackageException(cause, "exception caused:", false)
+			causeException = NewPackageException(config.Cause, "exception caused:", DefaultExceptionConfig().
+				SetGetStackTrace(false))
 		}
 	}
 

@@ -1,19 +1,22 @@
 package collections
 
-import "github.com/tursom/GoCollections/exceptions"
+import (
+	"github.com/tursom/GoCollections/exceptions"
+	"github.com/tursom/GoCollections/lang"
+)
 
-type MutableSubList struct {
-	list     MutableList
-	from, to uint32
+type MutableSubList[T lang.Object] struct {
+	list     MutableList[T]
+	from, to int
 }
 
-func NewMutableSubList(list MutableList, from, to uint32) *MutableSubList {
-	return &MutableSubList{list, from, to}
+func NewMutableSubList[T lang.Object](list MutableList[T], from, to int) MutableList[T] {
+	return &MutableSubList[T]{list, from, to}
 }
 
-func (s *MutableSubList) Iterator() Iterator {
+func (s *MutableSubList[T]) Iterator() Iterator[T] {
 	iterator := s.list.Iterator()
-	for i := 0; i < int(s.from); i++ {
+	for i := 0; i < s.from; i++ {
 		_, err := iterator.Next()
 		if err != nil {
 			return nil
@@ -22,72 +25,72 @@ func (s *MutableSubList) Iterator() Iterator {
 	return iterator
 }
 
-func (s *MutableSubList) Size() uint32 {
+func (s *MutableSubList[T]) Size() int {
 	return s.to - s.from
 }
 
-func (s *MutableSubList) IsEmpty() bool {
+func (s *MutableSubList[T]) IsEmpty() bool {
 	return s.Size() == 0
 }
 
-func (s *MutableSubList) Contains(element interface{}) bool {
-	return Contains(s, element)
+func (s *MutableSubList[T]) Contains(element T) bool {
+	return Contains[T](s, element)
 }
 
-func (s *MutableSubList) ContainsAll(c Collection) bool {
-	return ContainsAll(s, c)
+func (s *MutableSubList[T]) ContainsAll(c Collection[T]) bool {
+	return ContainsAll[T](s, c)
 }
 
-func (s *MutableSubList) Get(index uint32) (interface{}, exceptions.Exception) {
+func (s *MutableSubList[T]) Get(index int) (T, exceptions.Exception) {
 	return s.list.Get(index + s.from)
 }
 
-func (s *MutableSubList) SubList(from, to uint32) List {
-	return NewSubList(s, from, to)
+func (s *MutableSubList[T]) SubList(from, to int) List[T] {
+	return NewSubList[T](s, from, to)
 }
 
-func (s *MutableSubList) MutableIterator() MutableIterator {
+func (s *MutableSubList[T]) MutableIterator() MutableIterator[T] {
 	return nil
 }
 
-func (s *MutableSubList) Add(_ interface{}) bool {
+func (s *MutableSubList[T]) Add(_ T) bool {
 	return false
 }
 
-func (s *MutableSubList) Remove(element interface{}) exceptions.Exception {
+func (s *MutableSubList[T]) Remove(element T) exceptions.Exception {
 	return nil
 }
 
-func (s *MutableSubList) AddAll(_ Collection) bool {
+func (s *MutableSubList[T]) AddAll(_ Collection[T]) bool {
 	return false
 }
 
-func (s *MutableSubList) RemoveAll(_ Collection) bool {
+func (s *MutableSubList[T]) RemoveAll(_ Collection[T]) bool {
 	return false
 }
 
-func (s *MutableSubList) RetainAll(_ Collection) bool {
+func (s *MutableSubList[T]) RetainAll(_ Collection[T]) bool {
 	return false
 }
 
-func (s *MutableSubList) Clear() {
+func (s *MutableSubList[T]) Clear() {
 }
 
-func (s *MutableSubList) Set(index uint32, element interface{}) exceptions.Exception {
+func (s *MutableSubList[T]) Set(index int, element T) exceptions.Exception {
 	if index >= s.to-s.from {
-		return exceptions.NewIndexOutOfBound("", true)
+		return exceptions.NewIndexOutOfBound("", nil)
 	}
 	return s.list.Set(index+s.from, element)
 }
 
-func (s *MutableSubList) AddAtIndex(_ uint32, _ interface{}) bool {
+func (s *MutableSubList[T]) AddAtIndex(_ int, _ T) bool {
 	return false
 }
 
-func (s *MutableSubList) RemoveAt(index uint32) exceptions.Exception {
-	return exceptions.NewOperationNotSupportedException("", true)
+func (s *MutableSubList[T]) RemoveAt(index int) exceptions.Exception {
+	return exceptions.NewOperationNotSupportedException("", nil)
 }
 
-func (s *MutableSubList) SubMutableList(from, to uint32) MutableList {
-	return NewMutableSubList(s.list, s.from+from, to)
+func (s *MutableSubList[T]) SubMutableList(from, to int) MutableList[T] {
+	return NewMutableSubList[T](s.list, s.from+from, to)
 }

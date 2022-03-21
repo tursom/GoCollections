@@ -1,54 +1,57 @@
 package collections
 
-import "github.com/tursom/GoCollections/exceptions"
+import (
+	"github.com/tursom/GoCollections/exceptions"
+	"github.com/tursom/GoCollections/lang"
+)
 
-type ArrayList struct {
-	array []interface{}
-	used  uint32
+type ArrayList[T lang.Object] struct {
+	array []T
+	used  int
 }
 
-func NewArrayList() *ArrayList {
-	return &ArrayList{
-		make([]interface{}, 16),
+func NewArrayList[T lang.Object]() *ArrayList[T] {
+	return &ArrayList[T]{
+		make([]T, 16),
 		0,
 	}
 }
 
-func NewArrayListByCapacity(cap uint32) *ArrayList {
-	return &ArrayList{
-		make([]interface{}, cap),
+func NewArrayListByCapacity[T lang.Object](cap int) *ArrayList[T] {
+	return &ArrayList[T]{
+		make([]T, cap),
 		0,
 	}
 }
 
-func (a ArrayList) String() string {
-	return String(a)
+func (a ArrayList[T]) String() string {
+	return String[T](a)
 }
 
-func (a ArrayList) Iterator() Iterator {
+func (a ArrayList[T]) Iterator() Iterator[T] {
 	return a.MutableIterator()
 }
 
-func (a ArrayList) Size() uint32 {
+func (a ArrayList[T]) Size() int {
 	return a.used
 }
 
-func (a ArrayList) IsEmpty() bool {
+func (a ArrayList[T]) IsEmpty() bool {
 	return a.Size() == 0
 }
 
-func (a ArrayList) Contains(element interface{}) bool {
-	return Contains(a, element)
+func (a ArrayList[T]) Contains(element T) bool {
+	return Contains[T](a, element)
 }
 
-func (a ArrayList) ContainsAll(c Collection) bool {
-	return ContainsAll(a, c)
+func (a ArrayList[T]) ContainsAll(c Collection[T]) bool {
+	return ContainsAll[T](a, c)
 }
 
-func (a *ArrayList) Add(element interface{}) bool {
-	if a.used >= uint32(len(a.array)) {
+func (a *ArrayList[T]) Add(element T) bool {
+	if a.used >= len(a.array) {
 		oldArray := a.array
-		a.array = make([]interface{}, a.used*2)
+		a.array = make([]T, a.used*2)
 		copy(a.array, oldArray)
 	}
 	a.array[a.used] = element
@@ -56,62 +59,61 @@ func (a *ArrayList) Add(element interface{}) bool {
 	return true
 }
 
-func (a ArrayList) IndexOf(element interface{}) int {
-	var i uint32 = 0
-	for ; i < a.used; i++ {
-		if a.array[i] == element {
+func (a ArrayList[T]) IndexOf(element T) int {
+	for i := 0; i < a.used; i++ {
+		if lang.Equals(element, a.array[i]) {
 			return int(i)
 		}
 	}
 	return -1
 }
 
-func (a *ArrayList) Remove(element interface{}) exceptions.Exception {
+func (a *ArrayList[T]) Remove(element T) exceptions.Exception {
 	index := a.IndexOf(element)
 	if index < 0 {
-		return exceptions.NewElementNotFoundException("", true)
+		return exceptions.NewElementNotFoundException("", nil)
 	} else {
-		return a.RemoveAt(uint32(index))
+		return a.RemoveAt(int(index))
 	}
 }
 
-func (a *ArrayList) AddAll(c Collection) bool {
-	return AddAll(a, c)
+func (a *ArrayList[T]) AddAll(c Collection[T]) bool {
+	return AddAll[T](a, c)
 }
 
-func (a *ArrayList) RemoveAll(c Collection) bool {
-	return RemoveAll(a, c)
+func (a *ArrayList[T]) RemoveAll(c Collection[T]) bool {
+	return RemoveAll[T](a, c)
 }
 
-func (a *ArrayList) RetainAll(c Collection) bool {
-	return RetainAll(a, c)
+func (a *ArrayList[T]) RetainAll(c Collection[T]) bool {
+	return RetainAll[T](a, c)
 }
 
-func (a *ArrayList) Clear() {
+func (a *ArrayList[T]) Clear() {
 	a.used = 0
 }
 
-func (a ArrayList) Get(index uint32) (interface{}, exceptions.Exception) {
+func (a ArrayList[T]) Get(index int) (T, exceptions.Exception) {
 	if index >= a.used {
-		return nil, exceptions.NewIndexOutOfBound("", true)
+		return lang.Nil[T](), exceptions.NewIndexOutOfBound("", nil)
 	} else {
 		return a.array[index], nil
 	}
 }
 
-func (a ArrayList) SubList(from, to uint32) List {
-	return NewSubList(a, from, to)
+func (a ArrayList[T]) SubList(from, to int) List[T] {
+	return NewSubList[T](a, from, to)
 }
 
-func (a *ArrayList) Set(index uint32, element interface{}) exceptions.Exception {
+func (a *ArrayList[T]) Set(index int, element T) exceptions.Exception {
 	if index >= a.used {
-		return exceptions.NewIndexOutOfBound("", true)
+		return exceptions.NewIndexOutOfBound("", nil)
 	}
 	a.array[index] = element
 	return nil
 }
 
-func (a *ArrayList) AddAtIndex(index uint32, element interface{}) bool {
+func (a *ArrayList[T]) AddAtIndex(index int, element T) bool {
 	if !a.Add(element) {
 		return false
 	}
@@ -125,9 +127,9 @@ func (a *ArrayList) AddAtIndex(index uint32, element interface{}) bool {
 	return true
 }
 
-func (a *ArrayList) RemoveAt(index uint32) exceptions.Exception {
+func (a *ArrayList[T]) RemoveAt(index int) exceptions.Exception {
 	if index >= a.used {
-		return exceptions.NewIndexOutOfBound("", true)
+		return exceptions.NewIndexOutOfBound("", nil)
 	}
 
 	array := a.array
@@ -138,33 +140,33 @@ func (a *ArrayList) RemoveAt(index uint32) exceptions.Exception {
 	return nil
 }
 
-func (a *ArrayList) SubMutableList(from, to uint32) MutableList {
+func (a *ArrayList[T]) SubMutableList(from, to int) MutableList[T] {
 	panic("implement me")
 }
 
-func (a *ArrayList) MutableIterator() MutableIterator {
-	return &arrayListIterator{a, 0}
+func (a *ArrayList[T]) MutableIterator() MutableIterator[T] {
+	return &arrayListIterator[T]{a, 0}
 }
 
-type arrayListIterator struct {
-	arrayList *ArrayList
-	index     uint32
+type arrayListIterator[T lang.Object] struct {
+	arrayList *ArrayList[T]
+	index     int
 }
 
-func (a *arrayListIterator) HasNext() bool {
+func (a *arrayListIterator[T]) HasNext() bool {
 	return a.index < a.arrayList.used
 }
 
-func (a *arrayListIterator) Next() (interface{}, exceptions.Exception) {
+func (a *arrayListIterator[T]) Next() (T, exceptions.Exception) {
 	value, err := a.arrayList.Get(a.index)
 	if err != nil {
-		return nil, err
+		return lang.Nil[T](), err
 	}
 	a.index++
 	return value, nil
 }
 
-func (a *arrayListIterator) Remove() exceptions.Exception {
+func (a *arrayListIterator[T]) Remove() exceptions.Exception {
 	err := a.arrayList.RemoveAt(a.index - 1)
 	if err != nil {
 		return err

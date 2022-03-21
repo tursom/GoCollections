@@ -1,47 +1,48 @@
 package collections
 
 import "github.com/tursom/GoCollections/exceptions"
+import "github.com/tursom/GoCollections/lang"
 
-type Iterator interface {
+type Iterator[T any] interface {
 	HasNext() bool
-	Next() (interface{}, exceptions.Exception)
+	Next() (T, exceptions.Exception)
 }
 
-type Iterable interface {
-	Iterator() Iterator
+type Iterable[T any] interface {
+	Iterator() Iterator[T]
 }
 
-type MutableIterator interface {
+type MutableIterator[T any] interface {
 	HasNext() bool
-	Next() (interface{}, exceptions.Exception)
+	Next() (T, exceptions.Exception)
 	Remove() exceptions.Exception
 }
 
-type MutableIterable interface {
-	Iterator() Iterator
-	MutableIterator() MutableIterator
+type MutableIterable[T any] interface {
+	Iterator() Iterator[T]
+	MutableIterator() MutableIterator[T]
 }
 
-func Loop(iterable Iterable, f func(element interface{}) exceptions.Exception) exceptions.Exception {
+func Loop[T any](iterable Iterable[T], f func(element T) exceptions.Exception) exceptions.Exception {
 	if f == nil || iterable == nil {
-		return exceptions.NewNPE("", true)
+		return exceptions.NewNPE("", nil)
 	}
 	return LoopIterator(iterable.Iterator(), f)
 }
 
-func LoopMutable(
-	iterable MutableIterable,
-	f func(element interface{}, iterator MutableIterator) (err exceptions.Exception),
+func LoopMutable[T any](
+	iterable MutableIterable[T],
+	f func(element T, iterator MutableIterator[T]) (err exceptions.Exception),
 ) exceptions.Exception {
 	if f == nil || iterable == nil {
-		return exceptions.NewNPE("", true)
+		return exceptions.NewNPE("", nil)
 	}
 	return LoopMutableIterator(iterable.MutableIterator(), f)
 }
 
-func LoopIterator(iterator Iterator, f func(element interface{}) exceptions.Exception) exceptions.Exception {
+func LoopIterator[T any](iterator Iterator[T], f func(element T) exceptions.Exception) exceptions.Exception {
 	if f == nil || iterator == nil {
-		return exceptions.NewNPE("", true)
+		return exceptions.NewNPE("", nil)
 	}
 	for iterator.HasNext() {
 		next, err := iterator.Next()
@@ -56,12 +57,12 @@ func LoopIterator(iterator Iterator, f func(element interface{}) exceptions.Exce
 	return nil
 }
 
-func LoopMutableIterator(
-	iterator MutableIterator,
-	f func(element interface{}, iterator MutableIterator) (err exceptions.Exception),
+func LoopMutableIterator[T any](
+	iterator MutableIterator[T],
+	f func(element T, iterator MutableIterator[T]) (err exceptions.Exception),
 ) exceptions.Exception {
 	if f == nil || iterator == nil {
-		return exceptions.NewNPE("", true)
+		return exceptions.NewNPE("", nil)
 	}
 	for iterator.HasNext() {
 		next, err := iterator.Next()
@@ -76,7 +77,7 @@ func LoopMutableIterator(
 	return nil
 }
 
-func Size(iterable Iterable) (size uint32, err exceptions.Exception) {
+func Size[T any](iterable Iterable[T]) (size int, err exceptions.Exception) {
 	iterator := iterable.Iterator()
 	for iterator.HasNext() {
 		_, err = iterator.Next()
@@ -88,26 +89,26 @@ func Size(iterable Iterable) (size uint32, err exceptions.Exception) {
 	return
 }
 
-func Contains(l Iterable, element interface{}) bool {
-	return Loop(l, func(e interface{}) exceptions.Exception {
-		if e == element {
+func Contains[T lang.Object](l Iterable[T], element T) bool {
+	return Loop(l, func(e T) exceptions.Exception {
+		if lang.Equals(element, e) {
 			return exceptions.ElementFound
 		}
 		return nil
 	}) != nil
 }
 
-func Remove(l MutableIterable, element interface{}) exceptions.Exception {
-	return LoopMutable(l, func(e interface{}, iterator MutableIterator) (err exceptions.Exception) {
-		if element == e {
+func Remove[T lang.Object](l MutableIterable[T], element T) exceptions.Exception {
+	return LoopMutable(l, func(e T, iterator MutableIterator[T]) (err exceptions.Exception) {
+		if lang.Equals(element, e) {
 			return iterator.Remove()
 		}
 		return nil
 	})
 }
 
-func RemoveAll(l MutableIterable, collection Collection) bool {
-	return LoopMutable(l, func(element interface{}, iterator MutableIterator) (err exceptions.Exception) {
+func RemoveAll[T any](l MutableIterable[T], collection Collection[T]) bool {
+	return LoopMutable(l, func(element T, iterator MutableIterator[T]) (err exceptions.Exception) {
 		if collection.Contains(element) {
 			return iterator.Remove()
 		}
@@ -115,8 +116,8 @@ func RemoveAll(l MutableIterable, collection Collection) bool {
 	}) == nil
 }
 
-func RetainAll(l MutableIterable, collection Collection) bool {
-	return LoopMutable(l, func(element interface{}, iterator MutableIterator) exceptions.Exception {
+func RetainAll[T any](l MutableIterable[T], collection Collection[T]) bool {
+	return LoopMutable(l, func(element T, iterator MutableIterator[T]) exceptions.Exception {
 		if !collection.Contains(element) {
 			return iterator.Remove()
 		}
@@ -124,8 +125,8 @@ func RetainAll(l MutableIterable, collection Collection) bool {
 	}) == nil
 }
 
-func Clear(l MutableIterable) exceptions.Exception {
-	return LoopMutable(l, func(element interface{}, iterator MutableIterator) (err exceptions.Exception) {
+func Clear[T any](l MutableIterable[T]) exceptions.Exception {
+	return LoopMutable(l, func(element T, iterator MutableIterator[T]) (err exceptions.Exception) {
 		return iterator.Remove()
 	})
 }
