@@ -6,15 +6,16 @@ import (
 	"sync"
 )
 
-type ReentrantLock struct {
+type ReentrantRWLock struct {
 	lock      sync.Mutex
+	rlock     sync.RWMutex
 	cond      sync.Cond
 	recursion int32
 	host      int64
 }
 
-func NewReentrantLock() *ReentrantLock {
-	res := &ReentrantLock{
+func NewReentrantRWLock() *ReentrantRWLock {
+	res := &ReentrantRWLock{
 		recursion: 0,
 		host:      0,
 	}
@@ -22,7 +23,7 @@ func NewReentrantLock() *ReentrantLock {
 	return res
 }
 
-func (rt *ReentrantLock) Lock() {
+func (rt *ReentrantRWLock) Lock() {
 	id := GetGoroutineID()
 	rt.lock.Lock()
 	defer rt.lock.Unlock()
@@ -37,9 +38,10 @@ func (rt *ReentrantLock) Lock() {
 	}
 	rt.host = id
 	rt.recursion = 1
+	rt.rlock.Lock()
 }
 
-func (rt *ReentrantLock) Unlock() {
+func (rt *ReentrantRWLock) Unlock() {
 	rt.lock.Lock()
 	defer rt.lock.Unlock()
 
@@ -49,6 +51,21 @@ func (rt *ReentrantLock) Unlock() {
 
 	rt.recursion--
 	if rt.recursion == 0 {
+		rt.rlock.Unlock()
 		rt.cond.Signal()
 	}
+}
+
+func (rt *ReentrantRWLock) RLock() {
+	if rt.host == GetGoroutineID() {
+		return
+	}
+	rt.rlock.RLock()
+}
+
+func (rt *ReentrantRWLock) RUnlock() {
+	if rt.host == GetGoroutineID() {
+		return
+	}
+	rt.rlock.RUnlock()
 }
