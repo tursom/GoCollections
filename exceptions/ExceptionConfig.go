@@ -3,7 +3,7 @@ package exceptions
 type ExceptionConfig struct {
 	SkipStack     int
 	GetStackTrace bool
-	Cause         interface{}
+	Cause         any
 }
 
 func DefaultExceptionConfig() *ExceptionConfig {
@@ -30,7 +30,7 @@ func (c *ExceptionConfig) SetGetStackTrace(getStackTrace bool) *ExceptionConfig 
 	return c
 }
 
-func (c *ExceptionConfig) SetCause(cause interface{}) *ExceptionConfig {
+func (c *ExceptionConfig) SetCause(cause any) *ExceptionConfig {
 	if c == nil {
 		return DefaultExceptionConfig().SetCause(cause)
 	}

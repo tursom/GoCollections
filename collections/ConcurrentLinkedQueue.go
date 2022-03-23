@@ -8,10 +8,11 @@ import (
 )
 
 type ConcurrentLinkedQueue[T lang.Object] struct {
+	lang.BaseObject
 	head *concurrentLinkedQueueNode[T]
 }
 
-func (c ConcurrentLinkedQueue[T]) String() string {
+func (c *ConcurrentLinkedQueue[T]) String() string {
 	return String[T](c)
 }
 
@@ -30,10 +31,10 @@ func NewConcurrentLinkedQueue[T lang.Object]() *ConcurrentLinkedQueue[T] {
 	head := &concurrentLinkedQueueNode[T]{}
 	head.prev = head
 	head.next = head
-	return &ConcurrentLinkedQueue[T]{head}
+	return &ConcurrentLinkedQueue[T]{lang.NewBaseObject(), head}
 }
 
-func (c ConcurrentLinkedQueue[T]) Iterator() Iterator[T] {
+func (c *ConcurrentLinkedQueue[T]) Iterator() Iterator[T] {
 	return c.MutableIterator()
 }
 

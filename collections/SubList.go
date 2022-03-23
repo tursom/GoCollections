@@ -6,12 +6,13 @@ import (
 )
 
 type SubList[T lang.Object] struct {
+	lang.BaseObject
 	list     List[T]
 	from, to int
 }
 
-func NewSubList[T lang.Object](list List[T], from, to int) List[T] {
-	return &SubList[T]{list, from, to}
+func NewSubList[T lang.Object](list List[T], from, to int) *SubList[T] {
+	return &SubList[T]{lang.NewBaseObject(), list, from, to}
 }
 
 func (s *SubList[T]) Iterator() Iterator[T] {

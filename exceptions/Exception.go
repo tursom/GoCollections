@@ -57,7 +57,7 @@ func BuildStackTrace(builder *strings.Builder, e Exception, exceptionMsg string)
 
 func Try[R any](
 	f func() (ret R, err Exception),
-	catch func(panic interface{}) (ret R, err Exception),
+	catch func(panic any) (ret R, err Exception),
 ) (ret R, err Exception) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -95,7 +95,7 @@ func Package(err error) Exception {
 	return NewRuntimeException(err, "", DefaultExceptionConfig().SetCause(err))
 }
 
-func PackageAny(err interface{}) Exception {
+func PackageAny(err any) Exception {
 	if err == nil {
 		return nil
 	}
@@ -107,7 +107,7 @@ func PackageAny(err interface{}) Exception {
 	}
 }
 
-func PackagePanic(panic interface{}, exceptionMessage string) Exception {
+func PackagePanic(panic any, exceptionMessage string) Exception {
 	if panic == nil {
 		return nil
 	}

@@ -9,11 +9,11 @@ import (
 )
 
 func main() {
-	_, err := exceptions.Try(func() (interface{}, exceptions.Exception) {
+	_, err := exceptions.Try(func() (any, exceptions.Exception) {
 		panic("test")
-	}, func(r interface{}) (interface{}, exceptions.Exception) {
+	}, func(r any) (any, exceptions.Exception) {
 		fmt.Println("recover from panic", r)
-		return nil, exceptions.NewIndexOutOfBound(fmt.Sprint(r), true)
+		return nil, exceptions.NewIndexOutOfBound(fmt.Sprint(r), nil)
 	})
 	exceptions.Print(err)
 
@@ -62,7 +62,7 @@ func main() {
 	//	fmt.Println(list)
 	//}
 	//
-	//_ = collections.LoopMutable(list, func(element interface{}, iterator collections.MutableIterator) (err exceptions.Exception) {
+	//_ = collections.LoopMutable(list, func(element any, iterator collections.MutableIterator) (err exceptions.Exception) {
 	//	if element.(int)&1 == 0 {
 	//		err = iterator.Remove()
 	//	}

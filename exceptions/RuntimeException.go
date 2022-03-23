@@ -2,19 +2,21 @@ package exceptions
 
 import (
 	"fmt"
+	"github.com/tursom/GoCollections/lang"
 	"io"
 	"os"
 	"strings"
 )
 
 type RuntimeException struct {
+	lang.BaseObject
 	message          string
 	exceptionMessage string
 	stackTrace       []StackTrace
 	cause            Exception
 }
 
-func NewRuntimeException(message interface{}, exceptionMessage string, config *ExceptionConfig) RuntimeException {
+func NewRuntimeException(message any, exceptionMessage string, config *ExceptionConfig) RuntimeException {
 	if config == nil {
 		config = DefaultExceptionConfig()
 	}
@@ -40,6 +42,7 @@ func NewRuntimeException(message interface{}, exceptionMessage string, config *E
 	}
 
 	return RuntimeException{
+		BaseObject:       lang.NewBaseObject(),
 		message:          fmt.Sprint(message),
 		exceptionMessage: exceptionMessage,
 		stackTrace:       stackTrace,

@@ -2,10 +2,10 @@ package exceptions
 
 type PackageException struct {
 	RuntimeException
-	err interface{}
+	err any
 }
 
-func NewPackageException(err interface{}, exceptionMessage string, config *ExceptionConfig) *PackageException {
+func NewPackageException(err any, exceptionMessage string, config *ExceptionConfig) *PackageException {
 	config.AddSkipStack(1)
 	return &PackageException{
 		RuntimeException: NewRuntimeException(err, exceptionMessage, config),
@@ -13,11 +13,11 @@ func NewPackageException(err interface{}, exceptionMessage string, config *Excep
 	}
 }
 
-func (p *PackageException) Err() interface{} {
+func (p *PackageException) Err() any {
 	return p.err
 }
 
-func UnpackException(err interface{}) interface{} {
+func UnpackException(err any) any {
 	for err != nil {
 		switch err.(type) {
 		case *PackageException:

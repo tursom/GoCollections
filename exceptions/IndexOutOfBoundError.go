@@ -4,7 +4,7 @@ type IndexOutOfBound struct {
 	RuntimeException
 }
 
-func NewIndexOutOfBound(message interface{}, config *ExceptionConfig) *IndexOutOfBound {
+func NewIndexOutOfBound(message any, config *ExceptionConfig) *IndexOutOfBound {
 	config.AddSkipStack(1)
 	return &IndexOutOfBound{
 		NewRuntimeException(

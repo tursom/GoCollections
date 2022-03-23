@@ -15,7 +15,7 @@ func (a *arrayList[T]) Iterator() collections.Iterator[T] {
 }
 
 func (a *arrayList[T]) Size() int {
-	return len(a.array)
+	return lang.Len(a.array)
 }
 
 func (a *arrayList[T]) IsEmpty() bool {
@@ -44,7 +44,7 @@ type arrayListIterator[T lang.Object] struct {
 }
 
 func (a *arrayListIterator[T]) HasNext() bool {
-	return a.index < len(a.array)
+	return a.index < lang.Len(a.array)
 }
 
 func (a *arrayListIterator[T]) Next() (r T, err exceptions.Exception) {

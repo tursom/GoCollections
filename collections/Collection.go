@@ -68,6 +68,14 @@ type (
 	}
 )
 
+func ListGet[T lang.Object](list List[T], index int) T {
+	get, err := list.Get(index)
+	if err != nil {
+		panic(err)
+	}
+	return get
+}
+
 func ContainsAll[T lang.Object](l Collection[T], collection Collection[T]) bool {
 	return Loop[T](collection, func(e T) exceptions.Exception {
 		if l.Contains(e) {

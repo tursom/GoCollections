@@ -8,6 +8,7 @@ import (
 )
 
 type ConcurrentLinkedStack[T any] struct {
+	lang.BaseObject
 	head *concurrentLinkedStackNode[T]
 	p    *unsafe.Pointer
 }
@@ -28,7 +29,7 @@ type concurrentLinkedStackIterator[T any] struct {
 
 func NewConcurrentLinkedStack[T any]() *ConcurrentLinkedStack[T] {
 	head := &concurrentLinkedStackNode[T]{}
-	return &ConcurrentLinkedStack[T]{head, (*unsafe.Pointer)(unsafe.Pointer(&head.next))}
+	return &ConcurrentLinkedStack[T]{lang.NewBaseObject(), head, (*unsafe.Pointer)(unsafe.Pointer(&head.next))}
 }
 
 func (c ConcurrentLinkedStack[T]) Iterator() Iterator[T] {

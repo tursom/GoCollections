@@ -6,21 +6,18 @@ import (
 )
 
 type ArrayList[T lang.Object] struct {
+	lang.BaseObject
 	array []T
-	used  int
 }
 
 func NewArrayList[T lang.Object]() *ArrayList[T] {
-	return &ArrayList[T]{
-		make([]T, 16),
-		0,
-	}
+	return NewArrayListByCapacity[T](16)
 }
 
 func NewArrayListByCapacity[T lang.Object](cap int) *ArrayList[T] {
 	return &ArrayList[T]{
-		make([]T, cap),
-		0,
+		BaseObject: lang.NewBaseObject(),
+		array:      make([]T, 0, cap),
 	}
 }
 
@@ -33,7 +30,7 @@ func (a ArrayList[T]) Iterator() Iterator[T] {
 }
 
 func (a ArrayList[T]) Size() int {
-	return a.used
+	return lang.Len(a.array)
 }
 
 func (a ArrayList[T]) IsEmpty() bool {
@@ -49,20 +46,14 @@ func (a ArrayList[T]) ContainsAll(c Collection[T]) bool {
 }
 
 func (a *ArrayList[T]) Add(element T) bool {
-	if a.used >= len(a.array) {
-		oldArray := a.array
-		a.array = make([]T, a.used*2)
-		copy(a.array, oldArray)
-	}
-	a.array[a.used] = element
-	a.used++
+	a.array = lang.Append(a.array, element)
 	return true
 }
 
 func (a ArrayList[T]) IndexOf(element T) int {
-	for i := 0; i < a.used; i++ {
+	for i := 0; i < a.Size(); i++ {
 		if lang.Equals(element, a.array[i]) {
-			return int(i)
+			return i
 		}
 	}
 	return -1
@@ -73,7 +64,7 @@ func (a *ArrayList[T]) Remove(element T) exceptions.Exception {
 	if index < 0 {
 		return exceptions.NewElementNotFoundException("", nil)
 	} else {
-		return a.RemoveAt(int(index))
+		return a.RemoveAt(index)
 	}
 }
 
@@ -90,11 +81,11 @@ func (a *ArrayList[T]) RetainAll(c Collection[T]) bool {
 }
 
 func (a *ArrayList[T]) Clear() {
-	a.used = 0
+	a.array = []T{}
 }
 
 func (a ArrayList[T]) Get(index int) (T, exceptions.Exception) {
-	if index >= a.used {
+	if index >= a.Size() {
 		return lang.Nil[T](), exceptions.NewIndexOutOfBound("", nil)
 	} else {
 		return a.array[index], nil
@@ -106,7 +97,7 @@ func (a ArrayList[T]) SubList(from, to int) List[T] {
 }
 
 func (a *ArrayList[T]) Set(index int, element T) exceptions.Exception {
-	if index >= a.used {
+	if index >= a.Size() {
 		return exceptions.NewIndexOutOfBound("", nil)
 	}
 	a.array[index] = element
@@ -114,38 +105,36 @@ func (a *ArrayList[T]) Set(index int, element T) exceptions.Exception {
 }
 
 func (a *ArrayList[T]) AddAtIndex(index int, element T) bool {
-	if !a.Add(element) {
+	if index >= a.Size() {
 		return false
 	}
 
 	array := a.array
-	for i := a.used - 1; i > index; i++ {
-		array[i] = array[i-1]
-	}
-	array[index] = element
-	a.used++
+	a.array = lang.Append[T](array[:index], element)
+	a.array = lang.Append[T](a.array, array[index:]...)
 	return true
 }
 
 func (a *ArrayList[T]) RemoveAt(index int) exceptions.Exception {
-	if index >= a.used {
+	if index >= a.Size() {
 		return exceptions.NewIndexOutOfBound("", nil)
 	}
 
-	array := a.array
-	for i := index + 1; i < a.used; i++ {
-		array[i-1] = array[i]
-	}
-	a.used--
+	a.array = lang.Append[T](a.array[:index], a.array[index+1:]...)
 	return nil
 }
 
 func (a *ArrayList[T]) SubMutableList(from, to int) MutableList[T] {
-	panic("implement me")
+	return NewMutableSubList[T](a, from, to)
 }
 
 func (a *ArrayList[T]) MutableIterator() MutableIterator[T] {
 	return &arrayListIterator[T]{a, 0}
+}
+
+func (a *ArrayList[T]) RemoveLast() (T, exceptions.Exception) {
+	v, _ := a.Get(a.Size() - 1)
+	return v, a.RemoveAt(a.Size() - 1)
 }
 
 type arrayListIterator[T lang.Object] struct {
@@ -154,7 +143,7 @@ type arrayListIterator[T lang.Object] struct {
 }
 
 func (a *arrayListIterator[T]) HasNext() bool {
-	return a.index < a.arrayList.used
+	return a.index < a.arrayList.Size()
 }
 
 func (a *arrayListIterator[T]) Next() (T, exceptions.Exception) {

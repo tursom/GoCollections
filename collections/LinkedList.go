@@ -7,6 +7,7 @@ import (
 
 type (
 	LinkedList[T lang.Object] struct {
+		lang.BaseObject
 		head *linkedListNode[T]
 		size int
 	}
@@ -14,9 +15,13 @@ type (
 		prev, next *linkedListNode[T]
 		value      T
 	}
+	linkedListIterator[T lang.Object] struct {
+		list       *LinkedList[T]
+		node, head *linkedListNode[T]
+	}
 )
 
-func (l LinkedList[T]) String() string {
+func (l *LinkedList[T]) String() string {
 	return String[T](l)
 }
 
@@ -24,23 +29,23 @@ func NewLinkedList[T lang.Object]() *LinkedList[T] {
 	tail := &linkedListNode[T]{}
 	tail.prev = tail
 	tail.next = tail
-	return &LinkedList[T]{tail, 0}
+	return &LinkedList[T]{lang.NewBaseObject(), tail, 0}
 }
 
-func (l LinkedList[T]) Size() int {
+func (l *LinkedList[T]) Size() int {
 	return l.size
 }
 
-func (l LinkedList[T]) IsEmpty() bool {
+func (l *LinkedList[T]) IsEmpty() bool {
 	return l.size == 0
 }
 
-func (l LinkedList[T]) Contains(element T) bool {
-	return Contains[T](&l, element)
+func (l *LinkedList[T]) Contains(element T) bool {
+	return Contains[T](l, element)
 }
 
-func (l LinkedList[T]) ContainsAll(c Collection[T]) bool {
-	return ContainsAll[T](&l, c)
+func (l *LinkedList[T]) ContainsAll(c Collection[T]) bool {
+	return ContainsAll[T](l, c)
 }
 
 func (l *LinkedList[T]) Add(element T) bool {
@@ -83,7 +88,7 @@ func (l *LinkedList[T]) Clear() {
 	l.size = 0
 }
 
-func (l LinkedList[T]) SubList(from, to int) List[T] {
+func (l *LinkedList[T]) SubList(from, to int) List[T] {
 	return NewSubList[T](l, from, to)
 }
 
@@ -125,34 +130,57 @@ func (l *LinkedList[T]) RemoveAt(index int) exceptions.Exception {
 	}
 	return exceptions.NewIndexOutOfBound("", nil)
 }
+func (l *LinkedList[T]) RemoveLast() (T, exceptions.Exception) {
+	if l.head.next == l.head {
+		return lang.Nil[T](), exceptions.NewIndexOutOfBound("list is empty", nil)
+	}
+	return l.head.prev.remove(), nil
+}
 
 func (l *LinkedList[T]) SubMutableList(from, to int) MutableList[T] {
 	return NewMutableSubList[T](l, from, to)
 }
 
-func (l LinkedList[T]) Get(index int) (T, exceptions.Exception) {
-	node := l.head
-	for node != l.head {
+func (l *LinkedList[T]) Get(index int) (T, exceptions.Exception) {
+	if index < l.size/2 {
+		return loopLinkedListNodeUp[T](l.head, index)
+	} else {
+		return loopLinkedListNodeDown[T](l.head, l.size-index-1)
+	}
+}
+
+func loopLinkedListNodeUp[T lang.Object](head *linkedListNode[T], index int) (T, exceptions.Exception) {
+	node := head.next
+	for node != head {
 		if index == 0 {
 			return node.value, nil
 		}
 		index--
+		node = node.next
 	}
 
 	return lang.Nil[T](), exceptions.NewIndexOutOfBound("", nil)
 }
 
-func (l LinkedList[T]) Iterator() Iterator[T] {
+func loopLinkedListNodeDown[T lang.Object](head *linkedListNode[T], index int) (T, exceptions.Exception) {
+	node := head.prev
+	for node != head {
+		if index == 0 {
+			return node.value, nil
+		}
+		index--
+		node = node.prev
+	}
+
+	return lang.Nil[T](), exceptions.NewIndexOutOfBound("", nil)
+}
+
+func (l *LinkedList[T]) Iterator() Iterator[T] {
 	return l.MutableIterator()
 }
 
 func (l *LinkedList[T]) MutableIterator() MutableIterator[T] {
 	return &linkedListIterator[T]{l, l.head.next, l.head}
-}
-
-type linkedListIterator[T lang.Object] struct {
-	list       *LinkedList[T]
-	node, head *linkedListNode[T]
 }
 
 func (l *linkedListIterator[T]) HasNext() bool {
@@ -176,7 +204,8 @@ func (l *linkedListIterator[T]) Remove() exceptions.Exception {
 	return nil
 }
 
-func (l *linkedListNode[T]) remove() {
+func (l *linkedListNode[T]) remove() T {
 	l.next.prev = l.prev
 	l.prev.next = l.next
+	return l.value
 }
