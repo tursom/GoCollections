@@ -6,9 +6,8 @@ type PackageException struct {
 }
 
 func NewPackageException(err any, exceptionMessage string, config *ExceptionConfig) *PackageException {
-	config.AddSkipStack(1)
 	return &PackageException{
-		RuntimeException: NewRuntimeException(err, exceptionMessage, config),
+		RuntimeException: NewRuntimeException(err, exceptionMessage, config.AddSkipStack(1)),
 		err:              err,
 	}
 }

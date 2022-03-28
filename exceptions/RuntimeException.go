@@ -55,11 +55,9 @@ func (o RuntimeException) Cause() Exception {
 }
 
 func (o RuntimeException) Error() string {
-	if len(o.message) == 0 {
-		return "index out of bound"
-	} else {
-		return o.message
-	}
+	builder := strings.Builder{}
+	o.BuildPrintStackTrace(&builder)
+	return builder.String()
 }
 
 func (o RuntimeException) StackTrace() []StackTrace {
@@ -71,9 +69,7 @@ func (o RuntimeException) PrintStackTrace() {
 }
 
 func (o RuntimeException) PrintStackTraceTo(writer io.Writer) {
-	builder := strings.Builder{}
-	o.BuildPrintStackTrace(&builder)
-	bytes := []byte(builder.String())
+	bytes := []byte(o.Error())
 	writeBytes := 0
 	for writeBytes < len(bytes) {
 		write, err := writer.Write(bytes[writeBytes:])

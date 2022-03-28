@@ -6,6 +6,6 @@ type WrongCallHostException struct {
 
 func NewWrongCallHostException(message string) WrongCallHostException {
 	return WrongCallHostException{
-		NewRuntimeException(nil, message, nil),
+		NewRuntimeException(nil, message, DefaultExceptionConfig().AddSkipStack(1)),
 	}
 }

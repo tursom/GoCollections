@@ -5,12 +5,11 @@ type OperationNotSupportedException struct {
 }
 
 func NewOperationNotSupportedException(message any, config *ExceptionConfig) *OperationNotSupportedException {
-	config.AddSkipStack(1)
 	return &OperationNotSupportedException{
 		NewRuntimeException(
 			message,
 			"exception caused OperationNotSupportedException:",
-			config,
+			config.AddSkipStack(1),
 		),
 	}
 }

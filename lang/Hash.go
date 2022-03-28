@@ -29,7 +29,7 @@ func Hash32[T any](p *T) int32 {
 
 func Hash64[T any](p *T) int32 {
 	i := *(*int64)(unsafe.Pointer(p))
-	return int32(i)*31 ^ int32(i>>32)
+	return int32(i) ^ int32(i>>32)
 }
 
 func HashString(str string) int32 {

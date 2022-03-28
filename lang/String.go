@@ -13,6 +13,10 @@ func (i String) AsString() string {
 	return i.string
 }
 
+func (i String) GoString() string {
+	return i.string
+}
+
 func (i String) String() string {
 	return i.string
 }

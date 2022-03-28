@@ -5,12 +5,11 @@ type IndexOutOfBound struct {
 }
 
 func NewIndexOutOfBound(message any, config *ExceptionConfig) *IndexOutOfBound {
-	config.AddSkipStack(1)
 	return &IndexOutOfBound{
 		NewRuntimeException(
 			message,
 			"exception caused IndexOutOfBound:",
-			config,
+			config.AddSkipStack(1),
 		),
 	}
 }
