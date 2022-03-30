@@ -60,6 +60,10 @@ func (o RuntimeException) Error() string {
 	return builder.String()
 }
 
+func (o RuntimeException) ErrorMessage() string {
+	return o.exceptionMessage
+}
+
 func (o RuntimeException) StackTrace() []StackTrace {
 	return o.stackTrace
 }

@@ -6,11 +6,8 @@ import (
 )
 
 type Queue[T lang.Object] interface {
-	// Iterator MutableIterable
-	Iterator() Iterator[T]
-	// MutableIterator MutableIterable
-	MutableIterator() *linkedListIterator[T]
+	MutableIterable[T]
 
-	Push(element T) exceptions.Exception
-	Offer() (T, exceptions.Exception)
+	Offer(element T) exceptions.Exception
+	Poll() (T, exceptions.Exception)
 }

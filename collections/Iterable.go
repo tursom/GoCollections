@@ -13,13 +13,12 @@ type Iterable[T any] interface {
 }
 
 type MutableIterator[T any] interface {
-	HasNext() bool
-	Next() (T, exceptions.Exception)
+	Iterator[T]
 	Remove() exceptions.Exception
 }
 
 type MutableIterable[T any] interface {
-	Iterator() Iterator[T]
+	Iterable[T]
 	MutableIterator() MutableIterator[T]
 }
 

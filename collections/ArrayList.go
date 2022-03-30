@@ -5,10 +5,16 @@ import (
 	"github.com/tursom/GoCollections/lang"
 )
 
-type ArrayList[T lang.Object] struct {
-	lang.BaseObject
-	array []T
-}
+type (
+	ArrayList[T lang.Object] struct {
+		lang.BaseObject
+		array []T
+	}
+	arrayListIterator[T lang.Object] struct {
+		arrayList *ArrayList[T]
+		index     int
+	}
+)
 
 func NewArrayList[T lang.Object]() *ArrayList[T] {
 	return NewArrayListByCapacity[T](16)
@@ -135,11 +141,6 @@ func (a *ArrayList[T]) MutableIterator() MutableIterator[T] {
 func (a *ArrayList[T]) RemoveLast() (T, exceptions.Exception) {
 	v, _ := a.Get(a.Size() - 1)
 	return v, a.RemoveAt(a.Size() - 1)
-}
-
-type arrayListIterator[T lang.Object] struct {
-	arrayList *ArrayList[T]
-	index     int
 }
 
 func (a *arrayListIterator[T]) HasNext() bool {

@@ -9,7 +9,7 @@ import (
 
 type (
 	Collection[T any] interface {
-		Iterator() Iterator[T]
+		Iterable[T]
 		Size() int
 		IsEmpty() bool
 		Contains(element T) bool
@@ -17,13 +17,9 @@ type (
 	}
 
 	MutableCollection[T any] interface {
-		Iterator() Iterator[T]
-		Size() int
-		IsEmpty() bool
-		Contains(element T) bool
-		ContainsAll(c Collection[T]) bool
+		Collection[T]
+		MutableIterable[T]
 
-		MutableIterator() MutableIterator[T]
 		Add(element T) bool
 		Remove(element T) exceptions.Exception
 		AddAll(c Collection[T]) bool
@@ -33,33 +29,15 @@ type (
 	}
 
 	List[T any] interface {
-		Iterator() Iterator[T]
-		Size() int
-		IsEmpty() bool
-		Contains(element T) bool
-		ContainsAll(c Collection[T]) bool
+		Collection[T]
 
 		Get(index int) (T, exceptions.Exception)
 		SubList(from, to int) List[T]
 	}
 
 	MutableList[T any] interface {
-		Iterator() Iterator[T]
-		Size() int
-		IsEmpty() bool
-		Contains(element T) bool
-		ContainsAll(c Collection[T]) bool
-
-		MutableIterator() MutableIterator[T]
-		Add(element T) bool
-		Remove(element T) exceptions.Exception
-		AddAll(c Collection[T]) bool
-		RemoveAll(c Collection[T]) bool
-		RetainAll(c Collection[T]) bool
-		Clear()
-
-		Get(index int) (T, exceptions.Exception)
-		SubList(from, to int) List[T]
+		List[T]
+		MutableCollection[T]
 
 		Set(index int, element T) exceptions.Exception
 		AddAtIndex(index int, element T) bool

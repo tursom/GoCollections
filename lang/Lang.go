@@ -32,10 +32,10 @@ func Cast[T any](v any) T {
 	}
 }
 
-func ForceCast[T any](v *any) T {
+func ForceCast[T any](v unsafe.Pointer) T {
 	if v == nil {
 		return Nil[T]()
 	} else {
-		return Cast[T](unsafe.Pointer(v))
+		return Cast[T](v)
 	}
 }

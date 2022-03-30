@@ -10,6 +10,7 @@ import (
 type Exception interface {
 	Cause() Exception
 	Error() string
+	ErrorMessage() string
 	StackTrace() []StackTrace
 	PrintStackTrace()
 	PrintStackTraceTo(writer io.Writer)
@@ -46,7 +47,7 @@ func BuildStackTraceByArray(builder *strings.Builder, trace []StackTrace) {
 }
 
 func BuildStackTrace(builder *strings.Builder, e Exception, exceptionMsg string) {
-	builder.WriteString(fmt.Sprintln(exceptionMsg, e.Error()))
+	builder.WriteString(fmt.Sprintln(exceptionMsg, e.ErrorMessage()))
 	if e.StackTrace() == nil {
 		return
 	}
