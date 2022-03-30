@@ -1,7 +1,6 @@
 package exceptions
 
 import (
-	"fmt"
 	"github.com/tursom/GoCollections/lang"
 	"io"
 	"os"
@@ -10,13 +9,13 @@ import (
 
 type RuntimeException struct {
 	lang.BaseObject
-	message          string
-	exceptionMessage string
-	stackTrace       []StackTrace
-	cause            Exception
+	message       string
+	exceptionName string
+	stackTrace    []StackTrace
+	cause         Exception
 }
 
-func NewRuntimeException(message any, exceptionMessage string, config *ExceptionConfig) RuntimeException {
+func NewRuntimeException(message string, config *ExceptionConfig) RuntimeException {
 	if config == nil {
 		config = DefaultExceptionConfig()
 	}
@@ -26,27 +25,28 @@ func NewRuntimeException(message any, exceptionMessage string, config *Exception
 		stackTrace = GetStackTraceSkipDeep(config.SkipStack + 1)
 	}
 
-	if len(exceptionMessage) == 0 {
-		exceptionMessage = "exception caused:"
-	}
-
 	var causeException Exception = nil
 	if config.Cause != nil {
-		switch config.Cause.(type) {
+		switch e := config.Cause.(type) {
 		case Exception:
-			causeException = config.Cause.(Exception)
+			causeException = e
 		default:
-			causeException = NewPackageException(config.Cause, "exception caused:", DefaultExceptionConfig().
+			causeException = NewPackageException(config.Cause, DefaultExceptionConfig().
 				SetGetStackTrace(false))
 		}
 	}
 
+	exceptionName := "RuntimeException"
+	if len(config.ExceptionName) != 0 {
+		exceptionName = config.ExceptionName
+	}
+
 	return RuntimeException{
-		BaseObject:       lang.NewBaseObject(),
-		message:          fmt.Sprint(message),
-		exceptionMessage: exceptionMessage,
-		stackTrace:       stackTrace,
-		cause:            causeException,
+		BaseObject:    lang.NewBaseObject(),
+		message:       message,
+		stackTrace:    stackTrace,
+		cause:         causeException,
+		exceptionName: exceptionName,
 	}
 }
 
@@ -60,8 +60,12 @@ func (o RuntimeException) Error() string {
 	return builder.String()
 }
 
-func (o RuntimeException) ErrorMessage() string {
-	return o.exceptionMessage
+func (o RuntimeException) Message() string {
+	return o.message
+}
+
+func (o RuntimeException) Name() string {
+	return o.exceptionName
 }
 
 func (o RuntimeException) StackTrace() []StackTrace {
@@ -86,7 +90,7 @@ func (o RuntimeException) PrintStackTraceTo(writer io.Writer) {
 }
 
 func (o RuntimeException) BuildPrintStackTrace(builder *strings.Builder) {
-	BuildStackTrace(builder, o, o.exceptionMessage)
+	BuildStackTrace(builder, o)
 	if o.cause != nil {
 		builder.WriteString("caused by: ")
 		o.cause.BuildPrintStackTrace(builder)

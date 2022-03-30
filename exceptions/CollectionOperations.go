@@ -1,5 +1,5 @@
 package exceptions
 
-var ElementFound = NewRuntimeException("", "element found", DefaultExceptionConfig().SetGetStackTrace(false))
-var ElementNotFound = NewRuntimeException("", "element not found", DefaultExceptionConfig().SetGetStackTrace(false))
-var CollectionLoopFinished = NewRuntimeException("", "collection loop finished", DefaultExceptionConfig().SetGetStackTrace(false))
+var ElementFound = NewRuntimeException("", DefaultExceptionConfig().SetGetStackTrace(false).SetExceptionName("ElementFound"))
+var ElementNotFound = NewRuntimeException("", DefaultExceptionConfig().SetGetStackTrace(false).SetExceptionName("ElementNotFound"))
+var CollectionLoopFinished = NewRuntimeException("", DefaultExceptionConfig().SetGetStackTrace(false).SetExceptionName("CollectionLoopFinished"))

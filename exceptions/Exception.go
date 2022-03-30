@@ -10,7 +10,8 @@ import (
 type Exception interface {
 	Cause() Exception
 	Error() string
-	ErrorMessage() string
+	Name() string
+	Message() string
 	StackTrace() []StackTrace
 	PrintStackTrace()
 	PrintStackTraceTo(writer io.Writer)
@@ -46,8 +47,8 @@ func BuildStackTraceByArray(builder *strings.Builder, trace []StackTrace) {
 	}
 }
 
-func BuildStackTrace(builder *strings.Builder, e Exception, exceptionMsg string) {
-	builder.WriteString(fmt.Sprintln(exceptionMsg, e.ErrorMessage()))
+func BuildStackTrace(builder *strings.Builder, e Exception) {
+	builder.WriteString(fmt.Sprintf("exception caused %s: %s\n", e.Name(), e.Message()))
 	if e.StackTrace() == nil {
 		return
 	}
@@ -93,7 +94,7 @@ func Package(err error) Exception {
 	case Exception:
 		return err.(Exception)
 	}
-	return NewRuntimeException(err, "", DefaultExceptionConfig().SetCause(err))
+	return NewRuntimeException("", DefaultExceptionConfig().SetCause(err))
 }
 
 func PackageAny(err any) Exception {
@@ -104,7 +105,7 @@ func PackageAny(err any) Exception {
 	case error:
 		return Package(err.(error))
 	default:
-		return NewRuntimeException(err, "", DefaultExceptionConfig())
+		return NewRuntimeException("", DefaultExceptionConfig())
 	}
 }
 
@@ -114,16 +115,8 @@ func PackagePanic(panic any, exceptionMessage string) Exception {
 	}
 	switch panic.(type) {
 	case error:
-		return NewRuntimeException(
-			panic,
-			exceptionMessage,
-			DefaultExceptionConfig().SetCause(panic),
-		)
+		return NewRuntimeException("", DefaultExceptionConfig().SetCause(panic))
 	default:
-		return NewRuntimeException(
-			panic,
-			exceptionMessage,
-			DefaultExceptionConfig(),
-		)
+		return NewRuntimeException("", DefaultExceptionConfig())
 	}
 }

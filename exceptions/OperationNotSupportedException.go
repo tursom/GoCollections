@@ -4,12 +4,8 @@ type OperationNotSupportedException struct {
 	RuntimeException
 }
 
-func NewOperationNotSupportedException(message any, config *ExceptionConfig) *OperationNotSupportedException {
+func NewOperationNotSupportedException(message string, config *ExceptionConfig) *OperationNotSupportedException {
 	return &OperationNotSupportedException{
-		NewRuntimeException(
-			message,
-			"exception caused OperationNotSupportedException:",
-			config.AddSkipStack(1),
-		),
+		NewRuntimeException(message, config.AddSkipStack(1).SetExceptionName("OperationNotSupportedException")),
 	}
 }

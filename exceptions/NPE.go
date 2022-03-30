@@ -9,13 +9,9 @@ type NPE struct {
 	RuntimeException
 }
 
-func NewNPE(message any, config *ExceptionConfig) *NPE {
+func NewNPE(message string, config *ExceptionConfig) *NPE {
 	return &NPE{
-		NewRuntimeException(
-			message,
-			"exception caused NullPointerException:",
-			config.AddSkipStack(1),
-		),
+		NewRuntimeException(message, config.AddSkipStack(1).SetExceptionName("NPE")),
 	}
 }
 

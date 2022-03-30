@@ -4,6 +4,7 @@ type ExceptionConfig struct {
 	SkipStack     int
 	GetStackTrace bool
 	Cause         any
+	ExceptionName string
 }
 
 func DefaultExceptionConfig() *ExceptionConfig {
@@ -16,7 +17,7 @@ func DefaultExceptionConfig() *ExceptionConfig {
 
 func (c *ExceptionConfig) SetSkipStack(skipStack int) *ExceptionConfig {
 	if c == nil {
-		return DefaultExceptionConfig().SetSkipStack(skipStack)
+		return &ExceptionConfig{SkipStack: skipStack}
 	}
 	c.SkipStack = skipStack
 	return c
@@ -24,7 +25,7 @@ func (c *ExceptionConfig) SetSkipStack(skipStack int) *ExceptionConfig {
 
 func (c *ExceptionConfig) SetGetStackTrace(getStackTrace bool) *ExceptionConfig {
 	if c == nil {
-		return DefaultExceptionConfig().SetGetStackTrace(getStackTrace)
+		return &ExceptionConfig{GetStackTrace: getStackTrace}
 	}
 	c.GetStackTrace = getStackTrace
 	return c
@@ -32,7 +33,7 @@ func (c *ExceptionConfig) SetGetStackTrace(getStackTrace bool) *ExceptionConfig 
 
 func (c *ExceptionConfig) SetCause(cause any) *ExceptionConfig {
 	if c == nil {
-		return DefaultExceptionConfig().SetCause(cause)
+		return &ExceptionConfig{Cause: cause}
 	}
 	c.Cause = cause
 	return c
@@ -40,8 +41,16 @@ func (c *ExceptionConfig) SetCause(cause any) *ExceptionConfig {
 
 func (c *ExceptionConfig) AddSkipStack(skipStack int) *ExceptionConfig {
 	if c == nil {
-		return DefaultExceptionConfig().AddSkipStack(skipStack)
+		return &ExceptionConfig{SkipStack: skipStack}
 	}
 	c.SkipStack += skipStack
+	return c
+}
+
+func (c *ExceptionConfig) SetExceptionName(exceptionName string) *ExceptionConfig {
+	if c == nil {
+		return &ExceptionConfig{ExceptionName: exceptionName}
+	}
+	c.ExceptionName = exceptionName
 	return c
 }

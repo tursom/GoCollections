@@ -4,13 +4,9 @@ type IndexOutOfBound struct {
 	RuntimeException
 }
 
-func NewIndexOutOfBound(message any, config *ExceptionConfig) *IndexOutOfBound {
+func NewIndexOutOfBound(message string, config *ExceptionConfig) *IndexOutOfBound {
 	return &IndexOutOfBound{
-		NewRuntimeException(
-			message,
-			"exception caused IndexOutOfBound:",
-			config.AddSkipStack(1),
-		),
+		NewRuntimeException(message, config.AddSkipStack(1).SetExceptionName("IndexOutOfBound")),
 	}
 }
 
@@ -18,7 +14,7 @@ func CatchIndexOutOfBound[T any](f func() T, config *ExceptionConfig) (r T, err 
 	defer func() {
 		r := recover()
 		if r != nil {
-			err = NewIndexOutOfBound(r, config.AddSkipStack(3))
+			err = NewIndexOutOfBound("", config.AddSkipStack(3).SetCause(PackageAny(r)))
 		}
 	}()
 	r = f()

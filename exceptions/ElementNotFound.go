@@ -4,12 +4,8 @@ type ElementNotFoundException struct {
 	RuntimeException
 }
 
-func NewElementNotFoundException(message any, config *ExceptionConfig) *ElementNotFoundException {
+func NewElementNotFoundException(message string, config *ExceptionConfig) *ElementNotFoundException {
 	return &ElementNotFoundException{
-		NewRuntimeException(
-			message,
-			"exception caused ElementNotFoundException:",
-			config.AddSkipStack(1),
-		),
+		NewRuntimeException(message, config.AddSkipStack(1).SetExceptionName("ElementNotFoundException")),
 	}
 }

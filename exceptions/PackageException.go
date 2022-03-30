@@ -1,13 +1,27 @@
 package exceptions
 
+import (
+	"fmt"
+	"reflect"
+)
+
 type PackageException struct {
 	RuntimeException
 	err any
 }
 
-func NewPackageException(err any, exceptionMessage string, config *ExceptionConfig) *PackageException {
+func NewPackageException(err any, config *ExceptionConfig) *PackageException {
+	message := ""
+	switch e := err.(type) {
+	case error:
+		message = e.Error()
+	default:
+		message = fmt.Sprint(e)
+	}
+	t := reflect.TypeOf(err)
+	message = fmt.Sprintf("%s (%s)", message, t.Name())
 	return &PackageException{
-		RuntimeException: NewRuntimeException(err, exceptionMessage, config.AddSkipStack(1)),
+		RuntimeException: NewRuntimeException(message, config.AddSkipStack(1).SetExceptionName("PackageException")),
 		err:              err,
 	}
 }
