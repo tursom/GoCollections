@@ -82,7 +82,7 @@ func (q *ConcurrentLinkedQueue[T]) Poll() (T, exceptions.Exception) {
 }
 
 func (q *ConcurrentLinkedQueue[T]) MutableIterator() MutableIterator[T] {
-	return &concurrentLinkedQueueIterator[T]{node: q.head}
+	return &concurrentLinkedQueueIterator[T]{queue: q, node: q.head}
 }
 
 func (q *ConcurrentLinkedQueue[T]) Size() int {

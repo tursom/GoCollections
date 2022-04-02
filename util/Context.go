@@ -4,6 +4,7 @@ import (
 	"github.com/tursom/GoCollections/lang"
 	"github.com/tursom/GoCollections/lang/atomic"
 	"sync"
+	"unsafe"
 )
 
 var (
@@ -24,6 +25,7 @@ type (
 		lang.BaseObject
 		contextId int32
 		id        int32
+		supplier  func() any
 	}
 	contextMapImpl struct {
 		lang.BaseObject
@@ -43,9 +45,20 @@ func NewContext() *Context {
 }
 
 func AllocateContextKey[T any](ctx *Context) *ContextKey[T] {
+	return AllocateContextKeyWithDefault[T](ctx, nil)
+}
+
+func AllocateContextKeyWithDefault[T any](ctx *Context, supplier func() T) *ContextKey[T] {
+	var s func() any
+	if supplier != nil {
+		s = func() any {
+			return supplier()
+		}
+	}
 	return &ContextKey[T]{
 		contextId: ctx.contextId,
 		id:        ctx.keyId.Add(1) - 1,
+		supplier:  s,
 	}
 }
 
@@ -80,20 +93,33 @@ func (k *ContextKey[T]) Set(m ContextMap, value T) {
 }
 
 func (m *contextMapImpl) Get(key *ContextKey[any]) (any, bool) {
-	if len(m.array) < int(key.id) {
-		return nil, false
+	if len(m.array) <= int(key.id) {
+		if key.supplier == nil {
+			return nil, false
+		} else {
+			supplier := key.supplier()
+			m.Set(key, supplier)
+			return supplier, true
+		}
 	} else {
 		return m.array[key.id], true
 	}
 }
 
 func (m *contextMapImpl) Set(key *ContextKey[any], value any) {
-	if len(m.array) < int(key.id) {
-		newArray := make([]any, key.id)
+	if len(m.array) <= int(key.id) {
+		newArray := make([]any, key.id+1)
 		copy(newArray, m.array)
 		m.array = newArray
 	}
 	m.array[key.id] = value
+}
+
+func (m *concurrentContextMap) Get(key *ContextKey[any]) (any, bool) {
+	if len(m.array) <= int(key.id) && key.supplier != nil {
+		m.Set(key, key.supplier())
+	}
+	return m.contextMapImpl.Get(key)
 }
 
 func (m *concurrentContextMap) Set(key *ContextKey[any], value any) {
@@ -102,6 +128,7 @@ func (m *concurrentContextMap) Set(key *ContextKey[any], value any) {
 	m.contextMapImpl.Set(key, value)
 }
 
+//goland:noinspection GoRedundantConversion
 func (k *ContextKey[T]) asNormalKey() *ContextKey[any] {
-	return (*ContextKey[any])(k)
+	return (*ContextKey[any])(unsafe.Pointer(k))
 }
