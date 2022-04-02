@@ -48,7 +48,8 @@ func BuildStackTraceByArray(builder *strings.Builder, trace []StackTrace) {
 }
 
 func BuildStackTrace(builder *strings.Builder, e Exception) {
-	builder.WriteString(fmt.Sprintf("exception caused %s: %s\n", e.Name(), e.Message()))
+	builder.WriteString(e.Error())
+	builder.WriteString("\n")
 	if e.StackTrace() == nil {
 		return
 	}

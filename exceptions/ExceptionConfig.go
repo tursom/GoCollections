@@ -7,6 +7,10 @@ type ExceptionConfig struct {
 	ExceptionName string
 }
 
+func Cfg() *ExceptionConfig {
+	return DefaultExceptionConfig()
+}
+
 func DefaultExceptionConfig() *ExceptionConfig {
 	return &ExceptionConfig{
 		SkipStack:     0,

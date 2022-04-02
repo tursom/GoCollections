@@ -7,11 +7,11 @@ import (
 )
 
 func AsList[T lang.Object](arr []T) collections.List[T] {
-	return &arrayList[T]{arr}
+	return &arrayList[T]{array: arr}
 }
 
 func CheckedGet[T any](array []T, index int) (T, exceptions.Exception) {
 	return exceptions.CatchIndexOutOfBound(func() T {
 		return array[index]
-	}, exceptions.DefaultExceptionConfig().AddSkipStack(3))
+	}, exceptions.Cfg().AddSkipStack(3))
 }

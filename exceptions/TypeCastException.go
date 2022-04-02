@@ -12,7 +12,8 @@ type TypeCastException struct {
 
 func NewTypeCastException(message string, config *ExceptionConfig) *TypeCastException {
 	return &TypeCastException{
-		NewRuntimeException(message, config.AddSkipStack(1).SetExceptionName("TypeCastException")),
+		NewRuntimeException(message, config.AddSkipStack(1).
+			SetExceptionName("github.com.tursom.GoCollections.exceptions.TypeCastException")),
 	}
 }
 

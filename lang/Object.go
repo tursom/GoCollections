@@ -23,6 +23,10 @@ type (
 
 	Any = Object
 
+	IsBaseObject interface {
+		AsBaseObject() *BaseObject
+	}
+
 	BaseObject struct {
 	}
 )
@@ -54,6 +58,10 @@ func (b *BaseObject) AsObject() Object {
 	return b
 }
 
+func (b *BaseObject) AsBaseObject() *BaseObject {
+	return b
+}
+
 func (b *BaseObject) Equals(o Object) bool {
 	return b == o
 }
@@ -72,4 +80,15 @@ func (b *BaseObject) ToString() String {
 
 func (b *BaseObject) HashCode() int32 {
 	return Hash64(b)
+}
+
+func (b *BaseObject) Compare(t IsBaseObject) int {
+	o := t.AsBaseObject()
+	if b == o {
+		return 0
+	} else if uintptr(unsafe.Pointer(b)) > uintptr(unsafe.Pointer(o)) {
+		return 1
+	} else {
+		return -1
+	}
 }

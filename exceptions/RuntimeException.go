@@ -1,6 +1,7 @@
 package exceptions
 
 import (
+	"fmt"
 	"github.com/tursom/GoCollections/lang"
 	"io"
 	"os"
@@ -36,7 +37,7 @@ func NewRuntimeException(message string, config *ExceptionConfig) RuntimeExcepti
 		}
 	}
 
-	exceptionName := "RuntimeException"
+	exceptionName := "github.com.tursom.GoCollections.exceptions.RuntimeException"
 	if len(config.ExceptionName) != 0 {
 		exceptionName = config.ExceptionName
 	}
@@ -55,9 +56,17 @@ func (o RuntimeException) Cause() Exception {
 }
 
 func (o RuntimeException) Error() string {
-	builder := strings.Builder{}
-	o.BuildPrintStackTrace(&builder)
-	return builder.String()
+	message := o.message
+	if len(message) == 0 {
+		if o.cause != nil {
+			message = fmt.Sprintf("%s: %s", o.Name(), o.cause.Error())
+		} else {
+			message = o.Name()
+		}
+	} else {
+		message = fmt.Sprintf("%s: %s", o.Name(), message)
+	}
+	return message
 }
 
 func (o RuntimeException) Message() string {
@@ -77,7 +86,9 @@ func (o RuntimeException) PrintStackTrace() {
 }
 
 func (o RuntimeException) PrintStackTraceTo(writer io.Writer) {
-	bytes := []byte(o.Error())
+	builder := strings.Builder{}
+	o.BuildPrintStackTrace(&builder)
+	bytes := []byte(builder.String())
 	writeBytes := 0
 	for writeBytes < len(bytes) {
 		write, err := writer.Write(bytes[writeBytes:])

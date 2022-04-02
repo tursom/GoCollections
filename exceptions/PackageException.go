@@ -21,8 +21,9 @@ func NewPackageException(err any, config *ExceptionConfig) *PackageException {
 	t := reflect.TypeOf(err)
 	message = fmt.Sprintf("%s (%s)", message, t.Name())
 	return &PackageException{
-		RuntimeException: NewRuntimeException(message, config.AddSkipStack(1).SetExceptionName("PackageException")),
-		err:              err,
+		RuntimeException: NewRuntimeException(message, config.AddSkipStack(1).
+			SetExceptionName("github.com.tursom.GoCollections.exceptions.PackageException")),
+		err: err,
 	}
 }
 

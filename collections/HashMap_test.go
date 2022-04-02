@@ -13,4 +13,6 @@ func TestHashMap_put(t *testing.T) {
 		m.Put(lang.Int(i), i+1)
 	}
 	fmt.Println(m)
+	m.resize()
+	fmt.Println(m)
 }

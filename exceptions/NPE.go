@@ -11,7 +11,8 @@ type NPE struct {
 
 func NewNPE(message string, config *ExceptionConfig) *NPE {
 	return &NPE{
-		NewRuntimeException(message, config.AddSkipStack(1).SetExceptionName("NPE")),
+		NewRuntimeException(message, config.AddSkipStack(1).
+			SetExceptionName("github.com.tursom.GoCollections.exceptions.NPE")),
 	}
 }
 

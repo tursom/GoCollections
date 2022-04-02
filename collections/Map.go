@@ -14,8 +14,12 @@ type (
 
 	Map[K lang.Object, V any] interface {
 		MapLooper[K, V]
-		Put(k K, v V) (bool, exceptions.Exception)
 		Get(k K) (V, bool, exceptions.Exception)
+	}
+
+	MutableMap[K lang.Object, V any] interface {
+		Map[K, V]
+		Put(k K, v V) (bool, exceptions.Exception)
 		Remove(k K) (V, bool, exceptions.Exception)
 	}
 

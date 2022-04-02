@@ -7,6 +7,7 @@ import (
 )
 
 type arrayList[T lang.Object] struct {
+	lang.BaseObject
 	array []T
 }
 
@@ -35,7 +36,7 @@ func (a *arrayList[T]) Get(index int) (T, exceptions.Exception) {
 }
 
 func (a *arrayList[T]) SubList(from, to int) collections.List[T] {
-	return &arrayList[T]{a.array[from:to]}
+	return &arrayList[T]{array: a.array[from:to]}
 }
 
 type arrayListIterator[T lang.Object] struct {
@@ -51,7 +52,7 @@ func (a *arrayListIterator[T]) Next() (r T, err exceptions.Exception) {
 	defer func() {
 		r := recover()
 		if r != nil {
-			err = exceptions.NewNPE(r, nil)
+			err = exceptions.NewNPE("", exceptions.Cfg().SetCause(r))
 		}
 	}()
 	i := a.index
