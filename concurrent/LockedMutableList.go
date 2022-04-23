@@ -1,24 +1,25 @@
-package collections
+package concurrent
 
 import (
-	"github.com/tursom/GoCollections/concurrent"
+	"sync"
+
+	"github.com/tursom/GoCollections/collections"
 	"github.com/tursom/GoCollections/exceptions"
 	"github.com/tursom/GoCollections/lang"
-	"sync"
 )
 
 type (
 	LockedMutableList[T lang.Object] struct {
-		list MutableList[T]
-		lock concurrent.RWLock
+		list collections.MutableList[T]
+		lock RWLock
 	}
 	lockedMutableListIterator[T lang.Object] struct {
-		iterator MutableIterator[T]
-		lock     concurrent.RWLock
+		iterator collections.MutableIterator[T]
+		lock     RWLock
 	}
 )
 
-func MutableListWithLock[T lang.Object](list MutableList[T]) MutableList[T] {
+func MutableListWithLock[T lang.Object](list collections.MutableList[T]) collections.MutableList[T] {
 	return &LockedMutableList[T]{
 		list: list,
 		lock: &sync.RWMutex{},
@@ -26,10 +27,10 @@ func MutableListWithLock[T lang.Object](list MutableList[T]) MutableList[T] {
 }
 
 func (l *LockedMutableList[T]) String() string {
-	return String[T](l)
+	return collections.String[T](l)
 }
 
-func (l *LockedMutableList[T]) Iterator() Iterator[T] {
+func (l *LockedMutableList[T]) Iterator() collections.Iterator[T] {
 	return l.MutableIterator()
 }
 
@@ -51,14 +52,14 @@ func (l *LockedMutableList[T]) Contains(element T) bool {
 	return l.list.Contains(element)
 }
 
-func (l *LockedMutableList[T]) ContainsAll(c Collection[T]) bool {
+func (l *LockedMutableList[T]) ContainsAll(c collections.Collection[T]) bool {
 	l.lock.RLock()
 	defer l.lock.RUnlock()
 
 	return l.list.ContainsAll(c)
 }
 
-func (l *LockedMutableList[T]) MutableIterator() MutableIterator[T] {
+func (l *LockedMutableList[T]) MutableIterator() collections.MutableIterator[T] {
 	return &lockedMutableListIterator[T]{l.list.MutableIterator(), l.lock}
 }
 
@@ -76,21 +77,21 @@ func (l *LockedMutableList[T]) Remove(element T) exceptions.Exception {
 	return l.list.Remove(element)
 }
 
-func (l *LockedMutableList[T]) AddAll(c Collection[T]) bool {
+func (l *LockedMutableList[T]) AddAll(c collections.Collection[T]) bool {
 	l.lock.Lock()
 	defer l.lock.Unlock()
 
 	return l.list.AddAll(c)
 }
 
-func (l *LockedMutableList[T]) RemoveAll(c Collection[T]) bool {
+func (l *LockedMutableList[T]) RemoveAll(c collections.Collection[T]) bool {
 	l.lock.Lock()
 	defer l.lock.Unlock()
 
 	return l.list.RemoveAll(c)
 }
 
-func (l *LockedMutableList[T]) RetainAll(c Collection[T]) bool {
+func (l *LockedMutableList[T]) RetainAll(c collections.Collection[T]) bool {
 	l.lock.Lock()
 	defer l.lock.Unlock()
 
@@ -111,7 +112,7 @@ func (l *LockedMutableList[T]) Get(index int) (T, exceptions.Exception) {
 	return l.list.Get(index)
 }
 
-func (l *LockedMutableList[T]) SubList(from, to int) List[T] {
+func (l *LockedMutableList[T]) SubList(from, to int) collections.List[T] {
 	return l.SubMutableList(from, to)
 }
 
@@ -136,7 +137,7 @@ func (l *LockedMutableList[T]) RemoveAt(index int) exceptions.Exception {
 	return l.list.RemoveAt(index)
 }
 
-func (l *LockedMutableList[T]) SubMutableList(from, to int) MutableList[T] {
+func (l *LockedMutableList[T]) SubMutableList(from, to int) collections.MutableList[T] {
 	return &LockedMutableList[T]{l.list.SubMutableList(from, to), l.lock}
 }
 

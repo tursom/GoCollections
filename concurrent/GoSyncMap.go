@@ -1,36 +1,38 @@
-package collections
+package concurrent
 
 import (
-	"github.com/tursom/GoCollections/concurrent"
+	"sync"
+
+	"github.com/tursom/GoCollections/collections"
 	"github.com/tursom/GoCollections/exceptions"
 	"github.com/tursom/GoCollections/lang"
-	"sync"
 )
 
 type (
+	// GoSyncMap an map use go sync.Map to store hash slot
 	GoSyncMap[K lang.Object, V any] struct {
-		NodeMap[K, V]
+		collections.NodeMap[K, V]
 		m    sync.Map
-		lock concurrent.RWLock
+		lock RWLock
 	}
 )
 
 func NewGoSyncMap[K lang.Object, V any]() *GoSyncMap[K, V] {
 	m := &GoSyncMap[K, V]{lock: &sync.RWMutex{}}
-	m.MapNodeFinder = NewMapNodeFinderBySlot[K, V](m)
+	m.MapNodeFinder = collections.NewMapNodeFinderBySlot[K, V](m)
 	return m
 }
 
 func (g *GoSyncMap[K, V]) ToString() lang.String {
-	return MapToString[K, V](g)
+	return collections.MapToString[K, V](g)
 }
 
-func (g *GoSyncMap[K, V]) findSlot(k K) MapNode[K, V] {
+func (g *GoSyncMap[K, V]) findSlot(k K) collections.MapNode[K, V] {
 	hashCode := lang.HashCode(k)
 	p, _ := g.m.Load(hashCode)
-	root := lang.Cast[*SimpleMapNode[K, V]](p)
+	root := lang.Cast[*collections.SimpleMapNode[K, V]](p)
 	if root == nil {
-		root = &SimpleMapNode[K, V]{}
+		root = &collections.SimpleMapNode[K, V]{}
 		g.m.Store(hashCode, root)
 	}
 	return root

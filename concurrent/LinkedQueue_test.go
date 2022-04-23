@@ -1,13 +1,14 @@
-package collections
+package concurrent
 
 import (
 	"fmt"
-	"github.com/tursom/GoCollections/exceptions"
-	"github.com/tursom/GoCollections/lang"
 	"sync"
 	"testing"
 	"time"
 	"unsafe"
+
+	"github.com/tursom/GoCollections/exceptions"
+	"github.com/tursom/GoCollections/lang"
 )
 
 type data struct {
@@ -21,12 +22,12 @@ func (d *data) String() string {
 }
 
 func TestConcurrentLinkedQueue_NodeSize(t *testing.T) {
-	fmt.Println(unsafe.Alignof(concurrentLinkedStackNode[*data]{}))
-	fmt.Println(unsafe.Sizeof(concurrentLinkedStackNode[*data]{}))
+	fmt.Println(unsafe.Alignof(linkedStackNode[*data]{}))
+	fmt.Println(unsafe.Sizeof(linkedStackNode[*data]{}))
 }
 
 func TestConcurrentLinkedQueue_Push(t *testing.T) {
-	queue := NewConcurrentLinkedQueue[*data]()
+	queue := NewLinkedQueue[*data]()
 	cond := sync.WaitGroup{}
 	cond.Add(1)
 	for i := 0; i < 10; i++ {
@@ -46,11 +47,11 @@ func TestConcurrentLinkedQueue_Push(t *testing.T) {
 
 func TestConcurrentLinkedQueue_ThreadSafe(t *testing.T) {
 	times := 400000
-	queue := NewConcurrentLinkedQueue[*data]()
+	queue := NewLinkedQueue[*data]()
 	for i := 0; i < 100; i++ {
 		id := i
 		go func() {
-			//nodes := make([]ConcurrentLinkedQueueNode[*data], 0)
+			//nodes := make([]QueueNode[*data], 0)
 			for j := 0; j < times; j++ {
 				_ = queue.Offer(&data{id: id, index: j})
 				//node, _ := queue.OfferAndGetNode(&data{id: id, index: j})
@@ -81,8 +82,8 @@ func TestConcurrentLinkedQueue_ThreadSafe(t *testing.T) {
 }
 
 func Test_concurrentLinkedQueueIterator_Remove(t *testing.T) {
-	queue := NewConcurrentLinkedQueue[lang.Int]()
-	nodes := make([]ConcurrentLinkedQueueNode[lang.Int], 0)
+	queue := NewLinkedQueue[lang.Int]()
+	nodes := make([]QueueNode[lang.Int], 0)
 	for i := 0; i < 1000; i++ {
 		node, _ := queue.OfferAndGetNode(lang.Int(i))
 		nodes = append(nodes, node)

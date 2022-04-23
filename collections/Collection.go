@@ -2,18 +2,19 @@ package collections
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/tursom/GoCollections/exceptions"
 	"github.com/tursom/GoCollections/lang"
-	"strings"
 )
 
 type (
-	Collection[T any] interface {
-		Iterable[T]
+	Collection[E any] interface {
+		Iterable[E]
 		Size() int
 		IsEmpty() bool
-		Contains(element T) bool
-		ContainsAll(c Collection[T]) bool
+		Contains(element E) bool
+		ContainsAll(c Collection[E]) bool
 	}
 
 	MutableCollection[T any] interface {
@@ -33,6 +34,7 @@ type (
 
 		Get(index int) (T, exceptions.Exception)
 		SubList(from, to int) List[T]
+		ListIterator() ListIterator[T]
 	}
 
 	MutableList[T any] interface {
@@ -43,6 +45,7 @@ type (
 		AddAtIndex(index int, element T) bool
 		RemoveAt(index int) exceptions.Exception
 		SubMutableList(from, to int) MutableList[T]
+		MutableListIterator() MutableListIterator[T]
 	}
 )
 

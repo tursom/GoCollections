@@ -27,27 +27,35 @@ func NewArrayListByCapacity[T lang.Object](cap int) *ArrayList[T] {
 	}
 }
 
-func (a ArrayList[T]) String() string {
+func (a *ArrayList[T]) String() string {
 	return String[T](a)
 }
 
-func (a ArrayList[T]) Iterator() Iterator[T] {
+func (a *ArrayList[T]) Iterator() Iterator[T] {
 	return a.MutableIterator()
 }
 
-func (a ArrayList[T]) Size() int {
+func (a *ArrayList[T]) ListIterator() ListIterator[T] {
+	return a.MutableListIterator()
+}
+
+func (a *ArrayList[T]) MutableListIterator() MutableListIterator[T] {
+	return &arrayListIterator[T]{a, 0}
+}
+
+func (a *ArrayList[T]) Size() int {
 	return lang.Len(a.array)
 }
 
-func (a ArrayList[T]) IsEmpty() bool {
+func (a *ArrayList[T]) IsEmpty() bool {
 	return a.Size() == 0
 }
 
-func (a ArrayList[T]) Contains(element T) bool {
+func (a *ArrayList[T]) Contains(element T) bool {
 	return Contains[T](a, element)
 }
 
-func (a ArrayList[T]) ContainsAll(c Collection[T]) bool {
+func (a *ArrayList[T]) ContainsAll(c Collection[T]) bool {
 	return ContainsAll[T](a, c)
 }
 
@@ -56,7 +64,7 @@ func (a *ArrayList[T]) Add(element T) bool {
 	return true
 }
 
-func (a ArrayList[T]) IndexOf(element T) int {
+func (a *ArrayList[T]) IndexOf(element T) int {
 	for i := 0; i < a.Size(); i++ {
 		if lang.Equals(element, a.array[i]) {
 			return i
@@ -90,7 +98,7 @@ func (a *ArrayList[T]) Clear() {
 	a.array = []T{}
 }
 
-func (a ArrayList[T]) Get(index int) (T, exceptions.Exception) {
+func (a *ArrayList[T]) Get(index int) (T, exceptions.Exception) {
 	if index >= a.Size() {
 		return lang.Nil[T](), exceptions.NewIndexOutOfBound("", nil)
 	} else {
@@ -98,8 +106,8 @@ func (a ArrayList[T]) Get(index int) (T, exceptions.Exception) {
 	}
 }
 
-func (a ArrayList[T]) SubList(from, to int) List[T] {
-	return NewSubList[T](a, from, to)
+func (a *ArrayList[T]) SubList(from, to int) List[T] {
+	return a.SubMutableList(from, to)
 }
 
 func (a *ArrayList[T]) Set(index int, element T) exceptions.Exception {
@@ -131,7 +139,9 @@ func (a *ArrayList[T]) RemoveAt(index int) exceptions.Exception {
 }
 
 func (a *ArrayList[T]) SubMutableList(from, to int) MutableList[T] {
-	return NewMutableSubList[T](a, from, to)
+	return &ArrayList[T]{
+		array: a.array[from:to],
+	}
 }
 
 func (a *ArrayList[T]) MutableIterator() MutableIterator[T] {
@@ -162,5 +172,39 @@ func (a *arrayListIterator[T]) Remove() exceptions.Exception {
 		return err
 	}
 	a.index--
+	return nil
+}
+
+func (a *arrayListIterator[T]) HasPrevious() bool {
+	return a.index > 0
+}
+
+func (a *arrayListIterator[T]) Previous() (T, exceptions.Exception) {
+	if a.index <= 0 || a.index >= len(a.arrayList.array) {
+		return lang.Nil[T](), exceptions.NewIndexOutOfBound("", nil)
+	}
+	a.index--
+	return a.arrayList.array[a.index], a.arrayList.RemoveAt(a.index)
+}
+
+func (a *arrayListIterator[T]) NextIndex() int {
+	return a.index
+}
+
+func (a *arrayListIterator[T]) PreviousIndex() int {
+	return a.index - 1
+}
+
+func (a *arrayListIterator[T]) Set(value T) exceptions.Exception {
+	if a.index <= 0 {
+		return exceptions.NewIndexOutOfBound("", nil)
+	}
+	a.arrayList.array[a.index-1] = value
+	return nil
+}
+
+func (a *arrayListIterator[T]) Add(value T) exceptions.Exception {
+	a.arrayList.AddAtIndex(a.index, value)
+	a.index++
 	return nil
 }

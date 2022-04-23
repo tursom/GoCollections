@@ -33,12 +33,14 @@ func (p *PackageException) Err() any {
 
 func UnpackException(err any) any {
 	for err != nil {
-		switch err.(type) {
+		switch e := err.(type) {
 		case *PackageException:
-			err = err.(*PackageException).Err()
-			return err
+			return e.Err()
 		case Exception:
-			err = err.(Exception).Cause()
+			err = e.Cause()
+			if err == nil {
+				return e
+			}
 		default:
 			return err
 		}

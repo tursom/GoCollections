@@ -1,26 +1,58 @@
 package collections
 
-import "github.com/tursom/GoCollections/exceptions"
-import "github.com/tursom/GoCollections/lang"
+import (
+	"github.com/tursom/GoCollections/exceptions"
+	"github.com/tursom/GoCollections/lang"
+)
 
-type Iterator[T any] interface {
-	HasNext() bool
-	Next() (T, exceptions.Exception)
-}
+type (
+	// Iterator an iterator over a collection or another entity that can be represented as a sequence of elements.
+	// Allows to sequentially access the elements
+	Iterator[T any] interface {
+		// HasNext return true if the iterator has more elements
+		HasNext() bool
+		// Next returns the next element in the iteration
+		// return exceptions.IndexOutOfBound if there is no more element
+		Next() (T, exceptions.Exception)
+	}
 
-type Iterable[T any] interface {
-	Iterator() Iterator[T]
-}
+	// MutableIterator an iterator over a mutable collection.
+	// Provides the ability to remove elements while iterating.
+	MutableIterator[T any] interface {
+		Iterator[T]
+		// Remove removes from the underlying collection the last element returned by this iterator.
+		Remove() exceptions.Exception
+	}
 
-type MutableIterator[T any] interface {
-	Iterator[T]
-	Remove() exceptions.Exception
-}
+	// ListIterator an iterator over a collection that supports indexed access
+	ListIterator[T any] interface {
+		Iterator[T]
+		HasPrevious() bool
+		Previous() (T, exceptions.Exception)
+		NextIndex() int
+		PreviousIndex() int
+	}
 
-type MutableIterable[T any] interface {
-	Iterable[T]
-	MutableIterator() MutableIterator[T]
-}
+	// MutableListIterator an iterator over a mutable collection that supports indexed access
+	// Provides the ability to add, modify and remove elements while iterating.
+	MutableListIterator[T any] interface {
+		ListIterator[T]
+		MutableIterator[T]
+		Set(value T) exceptions.Exception
+		Add(value T) exceptions.Exception
+	}
+
+	// Iterable classes that inherit from this interface can be represented as a sequence of elements that can be iterated over.
+	// param T
+	Iterable[T any] interface {
+		Iterator() Iterator[T]
+	}
+
+	MutableIterable[T any] interface {
+		Iterable[T]
+		MutableIterator() MutableIterator[T]
+	}
+)
 
 func Loop[T any](iterable Iterable[T], f func(element T) exceptions.Exception) exceptions.Exception {
 	if f == nil || iterable == nil {

@@ -116,8 +116,8 @@ func PackagePanic(panic any, exceptionMessage string) Exception {
 	}
 	switch panic.(type) {
 	case error:
-		return NewRuntimeException("", DefaultExceptionConfig().SetCause(panic))
+		return NewRuntimeException(exceptionMessage, DefaultExceptionConfig().SetCause(panic))
 	default:
-		return NewRuntimeException("", DefaultExceptionConfig())
+		return NewPackageException(panic, nil)
 	}
 }
