@@ -3,9 +3,23 @@ package atomic
 import (
 	"sync/atomic"
 	"unsafe"
+
+	"github.com/tursom/GoCollections/lang"
 )
 
 type (
+	Atomizer[T any] interface {
+		Swap(new T) (old T)
+		CompareAndSwap(old, new T) (swapped bool)
+		Load() (val T)
+		Store(val T)
+	}
+
+	BitSet interface {
+		lang.BitSet
+		CompareAndSwapBit(bit int, old, new bool) (swapped bool)
+	}
+
 	Atomic[T any] struct {
 		Swap           func(addr *T, new T) (old T)
 		CompareAndSwap func(addr *T, old, new T) (swapped bool)
@@ -171,4 +185,71 @@ func StoreUintptr(addr *uintptr, val uintptr) {
 
 func StoreUnsafePointer(addr *unsafe.Pointer, val unsafe.Pointer) {
 	atomic.StorePointer(addr, val)
+}
+
+func SetBit[T int32 | int64 | uint32 | uint64](cas func(p *T, old, new T) bool, p *T, bit int, up bool) bool {
+	location := T(1) << bit
+	var old T
+	for {
+		old = *p
+		var newValue T
+		if up {
+			newValue = old | location
+		} else {
+			newValue = old & ^location
+		}
+		if cas(p, old, newValue) {
+			break
+		}
+	}
+	return old&location != 0
+}
+
+func SetBitInt32(p *int32, bit int, up bool) bool {
+	return SetBit(CompareAndSwapInt32, p, bit, up)
+}
+
+func SetBitInt64(p *int64, bit int, up bool) bool {
+	return SetBit(CompareAndSwapInt64, p, bit, up)
+}
+
+func SetBitUInt32(p *uint32, bit int, up bool) bool {
+	return SetBit(CompareAndSwapUInt32, p, bit, up)
+}
+
+func SetBitUInt64(p *uint32, bit int, up bool) bool {
+	return SetBit(CompareAndSwapUInt32, p, bit, up)
+}
+
+func CompareAndSwapBit[T int32 | int64 | uint32 | uint64](cas func(p *T, old, new T) bool, p *T, bit int, old, new bool) bool {
+	location := T(1) << bit
+	oldValue := *p
+	if old {
+		oldValue = oldValue | location
+	} else {
+		oldValue = oldValue & ^location
+	}
+	var newValue T
+	if new {
+		newValue = oldValue | location
+	} else {
+		newValue = oldValue & ^location
+	}
+	return cas(p, oldValue, newValue)
+}
+
+func CompareAndSwapBitInt32(p *int32, bit int, old, new bool) bool {
+	return CompareAndSwapBit(CompareAndSwapInt32, p, bit, old, new)
+}
+
+func CompareAndSwapBitInt64(p *int64, bit int, old, new bool) bool {
+	return CompareAndSwapBit(CompareAndSwapInt64, p, bit, old, new)
+}
+
+func CompareAndSwapBitUInt32(p *uint32, bit int, old, new bool) bool {
+	return CompareAndSwapBit(CompareAndSwapUInt32, p, bit, old, new)
+}
+
+func CompareAndSwapBitUInt64(p *uint64, bit int, old, new bool) bool {
+	return CompareAndSwapBit(CompareAndSwapUInt64, p, bit, old, new)
 }

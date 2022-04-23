@@ -4,8 +4,37 @@ import "strconv"
 
 type UInt uint
 
-func (i UInt) AsUInt() uint {
+type AsUInt interface {
+	Object
+	AsUInt() UInt
+}
+
+func CastUInt(v any) (uint, bool) {
+	switch i := v.(type) {
+	case uint:
+		return i, true
+	case AsUInt:
+		return i.AsUInt().V(), true
+	default:
+		return 0, false
+	}
+}
+
+func EqualsUInt(i1 AsUInt, i2 any) bool {
+	i2, ok := CastUInt(i2)
+	return ok && i2 == i1.AsUInt().V()
+}
+
+func (i UInt) V() uint {
 	return uint(i)
+}
+
+func (i *UInt) P() *uint {
+	return (*uint)(i)
+}
+
+func (i UInt) AsUInt() UInt {
+	return i
 }
 
 func (i UInt) String() string {
@@ -17,11 +46,7 @@ func (i UInt) AsObject() Object {
 }
 
 func (i UInt) Equals(e Object) bool {
-	i2, ok := e.(UInt)
-	if !ok {
-		return false
-	}
-	return i == i2
+	return EqualsUInt(i, e)
 }
 
 func (i UInt) ToString() String {
@@ -29,7 +54,7 @@ func (i UInt) ToString() String {
 }
 
 func (i UInt) HashCode() int32 {
-	return Int64(i).HashCode()
+	return int32(i)
 }
 
 func (i UInt) Compare(t UInt) int {

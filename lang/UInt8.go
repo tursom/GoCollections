@@ -4,10 +4,37 @@ import "strconv"
 
 type UInt8 uint8
 
-type Byte = UInt8
+type AsUInt8 interface {
+	Object
+	AsUInt8() UInt8
+}
 
-func (i UInt8) AsUInt8() uint8 {
+func CastUInt8(v any) (uint8, bool) {
+	switch i := v.(type) {
+	case uint8:
+		return i, true
+	case AsUInt8:
+		return i.AsUInt8().V(), true
+	default:
+		return 0, false
+	}
+}
+
+func EqualsUInt8(i1 AsUInt8, i2 any) bool {
+	i2, ok := CastUInt8(i2)
+	return ok && i2 == i1.AsUInt8().V()
+}
+
+func (i UInt8) V() uint8 {
 	return uint8(i)
+}
+
+func (i *UInt8) P() *uint8 {
+	return (*uint8)(i)
+}
+
+func (i UInt8) AsUInt8() UInt8 {
+	return i
 }
 
 func (i UInt8) String() string {
@@ -19,11 +46,7 @@ func (i UInt8) AsObject() Object {
 }
 
 func (i UInt8) Equals(e Object) bool {
-	i2, ok := e.(UInt8)
-	if !ok {
-		return false
-	}
-	return i == i2
+	return EqualsUInt8(i, e)
 }
 
 func (i UInt8) ToString() String {

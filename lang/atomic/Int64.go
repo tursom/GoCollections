@@ -4,26 +4,40 @@ import (
 	"sync/atomic"
 )
 
-type Int64 struct {
-	i int64
+type Int64 int64
+
+func (v *Int64) P() *int64 {
+	return (*int64)(v)
 }
 
 func (v *Int64) Load() (val int64) {
-	return atomic.LoadInt64(&v.i)
+	return atomic.LoadInt64(v.P())
 }
 
 func (v *Int64) Store(val int64) {
-	atomic.StoreInt64(&v.i, val)
+	atomic.StoreInt64(v.P(), val)
 }
 
 func (v *Int64) Swap(new int64) (old int64) {
-	return atomic.SwapInt64(&v.i, new)
+	return atomic.SwapInt64(v.P(), new)
 }
 
 func (v *Int64) CompareAndSwap(old, new int64) (swapped bool) {
-	return atomic.CompareAndSwapInt64(&v.i, old, new)
+	return atomic.CompareAndSwapInt64(v.P(), old, new)
 }
 
 func (v *Int64) Add(i int64) (new int64) {
-	return atomic.AddInt64(&v.i, i)
+	return atomic.AddInt64(v.P(), i)
+}
+
+func (v *Int64) BitLength() int {
+	return 64
+}
+
+func (v *Int64) SetBit(bit int, up bool) bool {
+	return SetBit(CompareAndSwapInt64, v.P(), bit, up)
+}
+
+func (v *Int64) CompareAndSwapBit(bit int, old, new bool) bool {
+	return CompareAndSwapBit(CompareAndSwapInt64, v.P(), bit, old, new)
 }

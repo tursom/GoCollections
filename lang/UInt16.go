@@ -4,8 +4,37 @@ import "strconv"
 
 type UInt16 uint16
 
-func (i UInt16) AsUInt16() uint16 {
+type AsUInt16 interface {
+	Object
+	AsUInt16() UInt16
+}
+
+func CastUInt16(v any) (uint16, bool) {
+	switch i := v.(type) {
+	case uint16:
+		return i, true
+	case AsUInt16:
+		return i.AsUInt16().V(), true
+	default:
+		return 0, false
+	}
+}
+
+func EqualsUInt16(i1 AsUInt16, i2 any) bool {
+	i2, ok := CastUInt16(i2)
+	return ok && i2 == i1.AsUInt16().V()
+}
+
+func (i UInt16) V() uint16 {
 	return uint16(i)
+}
+
+func (i *UInt16) P() *uint16 {
+	return (*uint16)(i)
+}
+
+func (i UInt16) AsUInt16() UInt16 {
+	return i
 }
 
 func (i UInt16) String() string {
@@ -17,11 +46,7 @@ func (i UInt16) AsObject() Object {
 }
 
 func (i UInt16) Equals(e Object) bool {
-	i2, ok := e.(UInt16)
-	if !ok {
-		return false
-	}
-	return i == i2
+	return EqualsUInt16(i, e)
 }
 
 func (i UInt16) ToString() String {

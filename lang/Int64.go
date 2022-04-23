@@ -4,8 +4,37 @@ import "strconv"
 
 type Int64 int64
 
-func (i Int64) AsInt64() int64 {
+type AsInt64 interface {
+	Object
+	AsInt64() Int64
+}
+
+func CastInt64(v any) (int64, bool) {
+	switch i := v.(type) {
+	case int64:
+		return i, true
+	case AsInt64:
+		return i.AsInt64().V(), true
+	default:
+		return 0, false
+	}
+}
+
+func EqualsInt64(i1 AsInt64, i2 any) bool {
+	i2, ok := CastInt64(i2)
+	return ok && i2 == i1.AsInt64().V()
+}
+
+func (i Int64) V() int64 {
 	return int64(i)
+}
+
+func (i *Int64) P() *int64 {
+	return (*int64)(i)
+}
+
+func (i Int64) AsInt64() Int64 {
+	return i
 }
 
 func (i Int64) String() string {
@@ -17,11 +46,7 @@ func (i Int64) AsObject() Object {
 }
 
 func (i Int64) Equals(e Object) bool {
-	i2, ok := e.(Int64)
-	if !ok {
-		return false
-	}
-	return i == i2
+	return EqualsInt64(i, e)
 }
 
 func (i Int64) ToString() String {

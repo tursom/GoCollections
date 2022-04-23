@@ -4,8 +4,37 @@ import "strconv"
 
 type Int8 int8
 
-func (i Int8) AsInt8() int8 {
+type AsInt8 interface {
+	Object
+	AsInt8() Int8
+}
+
+func CastInt8(v any) (int8, bool) {
+	switch i := v.(type) {
+	case int8:
+		return i, true
+	case AsInt8:
+		return i.AsInt8().V(), true
+	default:
+		return 0, false
+	}
+}
+
+func EqualsInt8(i1 AsInt8, i2 any) bool {
+	i2, ok := CastInt8(i2)
+	return ok && i2 == i1.AsInt8().V()
+}
+
+func (i Int8) V() int8 {
 	return int8(i)
+}
+
+func (i *Int8) P() *int8 {
+	return (*int8)(i)
+}
+
+func (i Int8) AsInt8() Int8 {
+	return i
 }
 
 func (i Int8) String() string {
@@ -17,11 +46,7 @@ func (i Int8) AsObject() Object {
 }
 
 func (i Int8) Equals(e Object) bool {
-	i2, ok := e.(Int8)
-	if !ok {
-		return false
-	}
-	return i == i2
+	return EqualsInt8(i, e)
 }
 
 func (i Int8) ToString() String {

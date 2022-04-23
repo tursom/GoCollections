@@ -4,8 +4,37 @@ import "strconv"
 
 type UInt32 uint32
 
-func (i UInt32) AsUInt32() uint32 {
+type AsUInt32 interface {
+	Object
+	AsUInt32() UInt32
+}
+
+func CastUInt32(v any) (uint32, bool) {
+	switch i := v.(type) {
+	case uint32:
+		return i, true
+	case AsUInt32:
+		return i.AsUInt32().V(), true
+	default:
+		return 0, false
+	}
+}
+
+func EqualsUInt32(i1 AsUInt32, i2 any) bool {
+	i2, ok := CastUInt32(i2)
+	return ok && i2 == i1.AsUInt32().V()
+}
+
+func (i UInt32) V() uint32 {
 	return uint32(i)
+}
+
+func (i *UInt32) P() *uint32 {
+	return (*uint32)(i)
+}
+
+func (i UInt32) AsUInt32() UInt32 {
+	return i
 }
 
 func (i UInt32) String() string {
@@ -17,11 +46,7 @@ func (i UInt32) AsObject() Object {
 }
 
 func (i UInt32) Equals(e Object) bool {
-	i2, ok := e.(UInt32)
-	if !ok {
-		return false
-	}
-	return i == i2
+	return EqualsUInt32(i, e)
 }
 
 func (i UInt32) ToString() String {
