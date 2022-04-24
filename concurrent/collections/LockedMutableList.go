@@ -1,9 +1,10 @@
-package concurrent
+package collections
 
 import (
 	"sync"
 
 	"github.com/tursom/GoCollections/collections"
+	"github.com/tursom/GoCollections/concurrent"
 	"github.com/tursom/GoCollections/exceptions"
 	"github.com/tursom/GoCollections/lang"
 )
@@ -11,11 +12,11 @@ import (
 type (
 	LockedMutableList[T lang.Object] struct {
 		list collections.MutableList[T]
-		lock RWLock
+		lock concurrent.RWLock
 	}
 	lockedMutableListIterator[T lang.Object] struct {
 		iterator collections.MutableIterator[T]
-		lock     RWLock
+		lock     concurrent.RWLock
 	}
 )
 
@@ -160,4 +161,14 @@ func (l *lockedMutableListIterator[T]) Remove() exceptions.Exception {
 	defer l.lock.Unlock()
 
 	return l.iterator.Remove()
+}
+
+func (l *LockedMutableList[T]) ListIterator() collections.ListIterator[T] {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (l *LockedMutableList[T]) MutableListIterator() collections.MutableListIterator[T] {
+	//TODO implement me
+	panic("implement me")
 }

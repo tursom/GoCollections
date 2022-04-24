@@ -18,6 +18,7 @@ type (
 	linkedListIterator[T lang.Object] struct {
 		list       *LinkedList[T]
 		node, head *linkedListNode[T]
+		index      int
 	}
 )
 
@@ -89,7 +90,7 @@ func (l *LinkedList[T]) Clear() {
 }
 
 func (l *LinkedList[T]) SubList(from, to int) List[T] {
-	return NewSubList[T](l, from, to)
+	return l.SubMutableList(from, to)
 }
 
 func (l *LinkedList[T]) Set(index int, element T) exceptions.Exception {
@@ -118,6 +119,12 @@ func (l *LinkedList[T]) AddAtIndex(index int, element T) bool {
 	return false
 }
 
+func (l *LinkedList[T]) addAtNode(node *linkedListNode[T], element T) {
+	l.size++
+	node.next = &linkedListNode[T]{node, node.next, element}
+	node.next.next.prev = node.next
+}
+
 func (l *LinkedList[T]) RemoveAt(index int) exceptions.Exception {
 	node := l.head
 	for node != l.head {
@@ -138,7 +145,22 @@ func (l *LinkedList[T]) RemoveLast() (T, exceptions.Exception) {
 }
 
 func (l *LinkedList[T]) SubMutableList(from, to int) MutableList[T] {
-	return NewMutableSubList[T](l, from, to)
+	if from < 0 || from < to || to > l.size {
+		panic(exceptions.NewIndexOutOfBound("", nil))
+	}
+	list := NewLinkedList[T]()
+	if from == to {
+		return list
+	}
+	node := l.head
+	for i := 0; i < from; i++ {
+		node = node.next
+	}
+	for i := from; i < to; i++ {
+		node = node.next
+		list.Add(node.value)
+	}
+	return list
 }
 
 func (l *LinkedList[T]) Get(index int) (T, exceptions.Exception) {
@@ -180,7 +202,15 @@ func (l *LinkedList[T]) Iterator() Iterator[T] {
 }
 
 func (l *LinkedList[T]) MutableIterator() MutableIterator[T] {
-	return &linkedListIterator[T]{l, l.head.next, l.head}
+	return l.MutableListIterator()
+}
+
+func (l *LinkedList[T]) ListIterator() ListIterator[T] {
+	return l.MutableListIterator()
+}
+
+func (l *LinkedList[T]) MutableListIterator() MutableListIterator[T] {
+	return &linkedListIterator[T]{l, l.head.next, l.head, 0}
 }
 
 func (l *linkedListIterator[T]) HasNext() bool {
@@ -192,6 +222,7 @@ func (l *linkedListIterator[T]) Next() (T, exceptions.Exception) {
 		return lang.Nil[T](), exceptions.NewIndexOutOfBound("", nil)
 	}
 	l.node = l.node.next
+	l.index++
 	return l.node.prev.value, nil
 }
 
@@ -208,4 +239,35 @@ func (l *linkedListNode[T]) remove() T {
 	l.next.prev = l.prev
 	l.prev.next = l.next
 	return l.value
+}
+
+func (l *linkedListIterator[T]) HasPrevious() bool {
+	return l.head.next != l.head
+}
+
+func (l *linkedListIterator[T]) Previous() (T, exceptions.Exception) {
+	if l.node.prev.prev == l.head {
+		return lang.Nil[T](), exceptions.NewIndexOutOfBound("", nil)
+	}
+	l.node = l.node.prev
+	l.index--
+	return l.node.prev.value, nil
+}
+
+func (l *linkedListIterator[T]) NextIndex() int {
+	return l.index
+}
+
+func (l *linkedListIterator[T]) PreviousIndex() int {
+	return l.index - 1
+}
+
+func (l *linkedListIterator[T]) Set(value T) exceptions.Exception {
+	l.node.prev.value = value
+	return nil
+}
+
+func (l *linkedListIterator[T]) Add(value T) exceptions.Exception {
+	l.list.addAtNode(l.node.prev, value)
+	return nil
 }

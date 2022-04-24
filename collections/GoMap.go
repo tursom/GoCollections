@@ -31,7 +31,7 @@ func (g *GoMap[K, V]) String() string {
 	return g.ToString().GoString()
 }
 
-func (g *GoMap[K, V]) findSlot(k K) MapNode[K, V] {
+func (g *GoMap[K, V]) FindSlot(k K) MapNode[K, V] {
 	hashCode := lang.HashCode(k)
 	root := g.m[hashCode]
 	if root == nil {
@@ -42,13 +42,13 @@ func (g *GoMap[K, V]) findSlot(k K) MapNode[K, V] {
 }
 
 //func (g *GoMap[K, V]) Put(k K, v V) (bool, exceptions.Exception) {
-//	node, _ := g.findNode(k, true)
+//	node, _ := g.FindNode(k, true)
 //	node.value = v
 //	return true, nil
 //}
 //
 //func (g *GoMap[K, V]) Get(k K) (V, bool, exceptions.Exception) {
-//	node, _ := g.findNode(k, false)
+//	node, _ := g.FindNode(k, false)
 //	if node == nil {
 //		return g.nil()
 //	} else {
@@ -57,7 +57,7 @@ func (g *GoMap[K, V]) findSlot(k K) MapNode[K, V] {
 //}
 //
 //func (g *GoMap[K, V]) Remove(k K) (V, bool, exceptions.Exception) {
-//	node, prev := g.findNode(k, false)
+//	node, prev := g.FindNode(k, false)
 //	if node == nil {
 //		return g.nil()
 //	} else {

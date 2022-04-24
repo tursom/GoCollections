@@ -2,9 +2,10 @@ package collections
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/tursom/GoCollections/exceptions"
 	"github.com/tursom/GoCollections/lang"
-	"strings"
 )
 
 type (
@@ -28,7 +29,7 @@ type (
 	}
 
 	MapSlotFinder[K lang.Object, V any] interface {
-		findSlot(k K) (root MapNode[K, V])
+		FindSlot(k K) (root MapNode[K, V])
 	}
 
 	MapNode[K lang.Object, V any] interface {
@@ -118,7 +119,7 @@ func (g *NodeMap[K, V]) nil() (V, bool, exceptions.Exception) {
 }
 
 func (m *MapNodeFinderBySlot[K, V]) findNode(k K, createIfNotExist bool) (node, prev MapNode[K, V]) {
-	prev = m.slotFinder.findSlot(k)
+	prev = m.slotFinder.FindSlot(k)
 	if prev != nil {
 		node = prev.GetNext()
 		for node != nil {

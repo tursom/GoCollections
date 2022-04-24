@@ -2,6 +2,7 @@ package collections
 
 import (
 	"fmt"
+
 	"github.com/tursom/GoCollections/exceptions"
 	"github.com/tursom/GoCollections/lang"
 )
@@ -51,7 +52,7 @@ func (m *HashMap[K, V]) String() string {
 	return MapToString[K, V](m).String()
 }
 
-func (m *HashMap[K, V]) findSlot(k K) MapNode[K, V] {
+func (m *HashMap[K, V]) FindSlot(k K) MapNode[K, V] {
 	hashCode := lang.HashCode(k)
 	hashCode ^= hashCode >> 16
 	index := int(hashCode) % len(m.slot)

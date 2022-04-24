@@ -1,9 +1,10 @@
-package concurrent
+package collections
 
 import (
 	"sync"
 
 	"github.com/tursom/GoCollections/collections"
+	"github.com/tursom/GoCollections/concurrent"
 	"github.com/tursom/GoCollections/exceptions"
 	"github.com/tursom/GoCollections/lang"
 )
@@ -13,7 +14,7 @@ type (
 	GoSyncMap[K lang.Object, V any] struct {
 		collections.NodeMap[K, V]
 		m    sync.Map
-		lock RWLock
+		lock concurrent.RWLock
 	}
 )
 
@@ -27,7 +28,7 @@ func (g *GoSyncMap[K, V]) ToString() lang.String {
 	return collections.MapToString[K, V](g)
 }
 
-func (g *GoSyncMap[K, V]) findSlot(k K) collections.MapNode[K, V] {
+func (g *GoSyncMap[K, V]) FindSlot(k K) collections.MapNode[K, V] {
 	hashCode := lang.HashCode(k)
 	p, _ := g.m.Load(hashCode)
 	root := lang.Cast[*collections.SimpleMapNode[K, V]](p)

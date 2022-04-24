@@ -14,5 +14,5 @@ type (
 		Poll() (T, exceptions.Exception)
 	}
 
-	QueueNode[T lang.Object] = StackNode[T]
+	QueueNode[T lang.Object] StackNode[T]
 )

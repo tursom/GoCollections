@@ -1,4 +1,4 @@
-package concurrent
+package collections
 
 import (
 	"github.com/tursom/GoCollections/collections"
@@ -8,7 +8,7 @@ import (
 )
 
 type (
-	LinkedStack[T lang.Object] struct {
+	ConcurrentLinkedStack[T lang.Object] struct {
 		lang.BaseObject
 		size    atomic.Int32
 		deleted atomic.Int32
@@ -23,35 +23,35 @@ type (
 
 	linkedStackIterator[T lang.Object] struct {
 		node  *linkedStackNode[T]
-		stack *LinkedStack[T]
+		stack *ConcurrentLinkedStack[T]
 	}
 )
 
-func (s *LinkedStack[T]) String() string {
+func (s *ConcurrentLinkedStack[T]) String() string {
 	return collections.String[T](s)
 }
 
-func NewLinkedStack[T lang.Object]() *LinkedStack[T] {
-	return &LinkedStack[T]{}
+func NewLinkedStack[T lang.Object]() *ConcurrentLinkedStack[T] {
+	return &ConcurrentLinkedStack[T]{}
 }
 
-func (s *LinkedStack[T]) Iterator() collections.Iterator[T] {
+func (s *ConcurrentLinkedStack[T]) Iterator() collections.Iterator[T] {
 	return s.MutableIterator()
 }
 
-func (s *LinkedStack[T]) Push(element T) exceptions.Exception {
+func (s *ConcurrentLinkedStack[T]) Push(element T) exceptions.Exception {
 	s.push(element)
 	return nil
 }
 
-func (s *LinkedStack[T]) PushAndGetNode(element T) collections.StackNode[T] {
+func (s *ConcurrentLinkedStack[T]) PushAndGetNode(element T) collections.StackNode[T] {
 	return &linkedStackIterator[T]{
 		node:  s.push(element),
 		stack: s,
 	}
 }
 
-func (s *LinkedStack[T]) push(element T) *linkedStackNode[T] {
+func (s *ConcurrentLinkedStack[T]) push(element T) *linkedStackNode[T] {
 	newNode := &linkedStackNode[T]{value: element, next: s.head}
 	for !atomic.CompareAndSwapPointer(&s.head, newNode.next, newNode) {
 		newNode.next = s.head
@@ -60,7 +60,7 @@ func (s *LinkedStack[T]) push(element T) *linkedStackNode[T] {
 	return newNode
 }
 
-func (s *LinkedStack[T]) Pop() (T, exceptions.Exception) {
+func (s *ConcurrentLinkedStack[T]) Pop() (T, exceptions.Exception) {
 	node := s.head
 	for node != nil && (!atomic.CompareAndSwapPointer(&s.head, node, node.next) || node.deleted) {
 		node = s.head
@@ -73,7 +73,7 @@ func (s *LinkedStack[T]) Pop() (T, exceptions.Exception) {
 	return node.value, nil
 }
 
-func (s *LinkedStack[T]) CleanDeleted() {
+func (s *ConcurrentLinkedStack[T]) CleanDeleted() {
 	if s.deleted.Load() <= s.size.Load() {
 		return
 	}
@@ -88,50 +88,50 @@ func (s *LinkedStack[T]) CleanDeleted() {
 	}
 }
 
-func (s *LinkedStack[T]) Size() int {
+func (s *ConcurrentLinkedStack[T]) Size() int {
 	return int(s.size.Load())
 }
 
-func (s *LinkedStack[T]) IsEmpty() bool {
+func (s *ConcurrentLinkedStack[T]) IsEmpty() bool {
 	return s.head == nil
 }
 
-func (s *LinkedStack[T]) Contains(element T) bool {
+func (s *ConcurrentLinkedStack[T]) Contains(element T) bool {
 	return collections.Contains[T](s, element)
 }
 
-func (s *LinkedStack[T]) ContainsAll(c collections.Collection[T]) bool {
+func (s *ConcurrentLinkedStack[T]) ContainsAll(c collections.Collection[T]) bool {
 	return collections.ContainsAll[T](s, c)
 }
 
-func (s *LinkedStack[T]) Add(element T) bool {
+func (s *ConcurrentLinkedStack[T]) Add(element T) bool {
 	exception := s.Push(element)
 	exceptions.Print(exception)
 	return exception == nil
 }
 
-func (s *LinkedStack[T]) Remove(element T) exceptions.Exception {
+func (s *ConcurrentLinkedStack[T]) Remove(element T) exceptions.Exception {
 	return collections.Remove[T](s, element)
 }
 
-func (s *LinkedStack[T]) AddAll(c collections.Collection[T]) bool {
+func (s *ConcurrentLinkedStack[T]) AddAll(c collections.Collection[T]) bool {
 	return collections.AddAll[T](s, c)
 }
 
-func (s *LinkedStack[T]) RemoveAll(c collections.Collection[T]) bool {
+func (s *ConcurrentLinkedStack[T]) RemoveAll(c collections.Collection[T]) bool {
 	return collections.RemoveAll[T](s, c)
 }
 
-func (s *LinkedStack[T]) RetainAll(c collections.Collection[T]) bool {
+func (s *ConcurrentLinkedStack[T]) RetainAll(c collections.Collection[T]) bool {
 	return collections.RetainAll[T](s, c)
 }
 
-func (s *LinkedStack[T]) Clear() {
+func (s *ConcurrentLinkedStack[T]) Clear() {
 	s.head = nil
 	s.size.Store(0)
 }
 
-func (s *LinkedStack[T]) MutableIterator() collections.MutableIterator[T] {
+func (s *ConcurrentLinkedStack[T]) MutableIterator() collections.MutableIterator[T] {
 	return &linkedStackIterator[T]{s.head, nil}
 }
 

@@ -2,7 +2,6 @@ package collections
 
 import (
 	"github.com/tursom/GoCollections/exceptions"
-	"github.com/tursom/GoCollections/lang"
 )
 
 type (
@@ -14,7 +13,7 @@ type (
 		Pop() (T, exceptions.Exception)
 	}
 
-	StackNode[T lang.Object] interface {
+	StackNode[T any] interface {
 		Set(value T) exceptions.Exception
 		Get() (T, exceptions.Exception)
 		Remove() exceptions.Exception

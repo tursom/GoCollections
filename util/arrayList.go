@@ -11,8 +11,12 @@ type arrayList[T lang.Object] struct {
 	array []T
 }
 
-func (a *arrayList[T]) Iterator() collections.Iterator[T] {
+func (a *arrayList[T]) ListIterator() collections.ListIterator[T] {
 	return &arrayListIterator[T]{a.array, 0}
+}
+
+func (a *arrayList[T]) Iterator() collections.Iterator[T] {
+	return a.ListIterator()
 }
 
 func (a *arrayList[T]) Size() int {
@@ -42,6 +46,23 @@ func (a *arrayList[T]) SubList(from, to int) collections.List[T] {
 type arrayListIterator[T lang.Object] struct {
 	array []T
 	index int
+}
+
+func (a *arrayListIterator[T]) HasPrevious() bool {
+	return a.index > 0
+}
+
+func (a *arrayListIterator[T]) Previous() (T, exceptions.Exception) {
+	a.index--
+	return a.array[a.index], nil
+}
+
+func (a *arrayListIterator[T]) NextIndex() int {
+	return a.index
+}
+
+func (a *arrayListIterator[T]) PreviousIndex() int {
+	return a.index - 1
 }
 
 func (a *arrayListIterator[T]) HasNext() bool {
