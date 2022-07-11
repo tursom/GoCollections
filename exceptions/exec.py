@@ -1,3 +1,5 @@
+# this script due to build Exec.go
+
 def arg_list(arg_size):
     if arg_size == 0:
         return ""

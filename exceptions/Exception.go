@@ -58,6 +58,12 @@ func BuildStackTrace(builder *strings.Builder, e Exception) {
 	}
 }
 
+func GetStackTraceString(e Exception) string {
+	builder := &strings.Builder{}
+	BuildStackTrace(builder, e)
+	return builder.String()
+}
+
 func Try[R any](
 	f func() (ret R, err Exception),
 	catch func(panic any) (ret R, err Exception),

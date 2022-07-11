@@ -5,16 +5,18 @@ import (
 
 	"github.com/tursom/GoCollections/exceptions"
 	"github.com/tursom/GoCollections/lang/atomic"
+	"github.com/tursom/GoCollections/util"
 )
 
 type (
 	// Sequence 一个用于并发生产场景下使消息有序的 Sequence
 	// 数据的接收顺序与 Sender 的生成顺序保持一致
 	Sequence[T any] struct {
-		lock sync.Mutex
-		ch   chan T
-		head *sequenceNode[T]
-		end  **sequenceNode[T]
+		lock  sync.Mutex
+		ch    chan T
+		head  *sequenceNode[T]
+		end   **sequenceNode[T]
+		close sync.Once
 	}
 
 	// SequenceSender 用于给 Sequence 发送信息
@@ -73,6 +75,9 @@ func (s *Sequence[T]) Alloc() SequenceSender[T] {
 
 // send 清空 Sequence 中可发送的消息
 func (s *Sequence[T]) send() {
+	if s.Closed() {
+		return
+	}
 	channel := s.channel()
 	s.lock.Lock()
 	defer s.lock.Unlock()
@@ -82,8 +87,7 @@ func (s *Sequence[T]) send() {
 		if head.cause == nil {
 			channel <- head.value
 		} else {
-			close(channel)
-			s.ch = nil
+			s.Close()
 			panic(head.cause)
 		}
 		head = head.next
@@ -91,9 +95,25 @@ func (s *Sequence[T]) send() {
 		// 防止 sequenceNode.Send 判断自身是否是 head 产生的问题
 		atomic.StorePointer(&s.head, head)
 	}
+	if head == nil {
+		s.end = &s.head
+	}
+}
+
+func (s *Sequence[T]) Close() {
+	s.close.Do(func() {
+		close(s.channel())
+	})
+}
+
+func (s *Sequence[T]) Closed() bool {
+	return util.OnceDone(&s.close)
 }
 
 func (s *sequenceNode[T]) Send(value T) {
+	if s.sequence.Closed() {
+		return
+	}
 	s.value = value
 	s.sent = true
 	if atomic.LoadPointer(&s.sequence.head) == s {
@@ -102,6 +122,9 @@ func (s *sequenceNode[T]) Send(value T) {
 }
 
 func (s *sequenceNode[T]) Fail(cause exceptions.Exception) {
+	if s.sequence.Closed() {
+		return
+	}
 	s.cause = cause
 	s.sent = true
 	if atomic.LoadPointer(&s.sequence.head) == s {
