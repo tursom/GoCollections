@@ -33,6 +33,26 @@ func NewLinkedList[T lang.Object]() *LinkedList[T] {
 	return &LinkedList[T]{lang.NewBaseObject(), tail, 0}
 }
 
+func NewLinkedListFrom[T lang.Object](list List[T], from, to int) *LinkedList[T] {
+	newList := NewLinkedList[T]()
+	iterator, err := SkipIterator[T](list.ListIterator(), to-from)
+	if err != nil {
+		panic(err)
+	}
+
+	for i := 0; i < to-from; i++ {
+		next, err := iterator.Next()
+		if err != nil {
+			panic(err)
+		}
+
+		// newList wont throw any exception in this place
+		_ = newList.Add(next)
+	}
+
+	return newList
+}
+
 func (l *LinkedList[T]) Size() int {
 	return l.size
 }
@@ -161,6 +181,7 @@ func (l *LinkedList[T]) SubMutableList(from, to int) MutableList[T] {
 		list.Add(node.value)
 	}
 	return list
+	return NewArrayListFrom[T](l, from, to)
 }
 
 func (l *LinkedList[T]) Get(index int) (T, exceptions.Exception) {

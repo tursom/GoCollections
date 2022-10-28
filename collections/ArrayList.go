@@ -27,6 +27,27 @@ func NewArrayListByCapacity[T lang.Object](cap int) *ArrayList[T] {
 	}
 }
 
+// NewArrayListFrom create a new ArrayList from list by index from [from] until [to]
+func NewArrayListFrom[T lang.Object](list List[T], from, to int) *ArrayList[T] {
+	newList := NewArrayListByCapacity[T](to - from)
+	iterator, err := SkipIterator[T](list.ListIterator(), to-from)
+	if err != nil {
+		panic(err)
+	}
+
+	for i := 0; i < to-from; i++ {
+		next, err := iterator.Next()
+		if err != nil {
+			panic(err)
+		}
+
+		// newList wont throw any exception in this place
+		_ = newList.Add(next)
+	}
+
+	return newList
+}
+
 func (a *ArrayList[T]) String() string {
 	return String[T](a)
 }

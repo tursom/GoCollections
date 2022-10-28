@@ -2,10 +2,28 @@ package collections
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/tursom/GoCollections/exceptions"
 	"github.com/tursom/GoCollections/lang"
-	"testing"
 )
+
+func Test_NewArrayListByCapacity(t *testing.T) {
+	capacity := 10
+	list := NewArrayListByCapacity[lang.Int](capacity)
+	if len(list.array) != 0 && cap(list.array) != capacity {
+		t.Fail()
+	}
+}
+
+func Test_NewArrayListFrom(t *testing.T) {
+	list := NewArrayList[lang.Int]()
+	for i := 0; i < 10; i++ {
+		list.Add(lang.Int(i))
+	}
+	newList := NewArrayListFrom[lang.Int](list, 5, 6)
+	fmt.Println(newList)
+}
 
 func TestArrayListAdd(t *testing.T) {
 	list := NewArrayList[lang.Int]()
@@ -39,7 +57,8 @@ func TestLinkedList(t *testing.T) {
 					return nil, nil, nil
 				},
 			)
-			fmt.Println(exceptions.Exec2r1((*LinkedList[lang.Int]).Get, list, j).AsInt())
+			//get := (*LinkedList[lang.Int]).Get
+			//fmt.Println(exceptions.Exec2r1[func(int) (int, exceptions.Exception), List[int], int](get, list, j).AsInt())
 		}
 	}
 	for i := 0; i < 10; i++ {

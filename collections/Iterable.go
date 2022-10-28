@@ -161,3 +161,19 @@ func Clear[T any](l MutableIterable[T]) exceptions.Exception {
 		return iterator.Remove()
 	})
 }
+
+// SkipIterator skip [skip] items of [iterator]
+// returns [iterator] itself
+func SkipIterator[T any](iterator Iterator[T], skip int) (Iterator[T], exceptions.Exception) {
+	for i := 0; i < skip; i++ {
+		if iterator.HasNext() {
+			_, err := iterator.Next()
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			break
+		}
+	}
+	return iterator, nil
+}

@@ -73,6 +73,7 @@ func (s *ConcurrentLinkedStack[T]) Pop() (T, exceptions.Exception) {
 	return node.value, nil
 }
 
+// CleanDeleted tell stack that may clean deleted nodes
 func (s *ConcurrentLinkedStack[T]) CleanDeleted() {
 	if s.deleted.Load() <= s.size.Load() {
 		return

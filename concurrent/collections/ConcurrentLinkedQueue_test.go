@@ -2,11 +2,13 @@ package collections
 
 import (
 	"fmt"
+	"math/rand"
 	"sync"
 	"testing"
 	"time"
 	"unsafe"
 
+	"github.com/tursom/GoCollections/collections"
 	"github.com/tursom/GoCollections/exceptions"
 	"github.com/tursom/GoCollections/lang"
 )
@@ -83,16 +85,59 @@ func TestConcurrentLinkedQueue_ThreadSafe(t *testing.T) {
 
 func Test_concurrentLinkedQueueIterator_Remove(t *testing.T) {
 	queue := NewLinkedQueue[lang.Int]()
-	nodes := make([]QueueNode[lang.Int], 0)
-	for i := 0; i < 1000; i++ {
+
+	for i := 0; i < 16; i++ {
+		testConcurrentLinkedQueueIteratorRemove(t, queue, 1000)
+		t.Logf("Test_concurrentLinkedQueueIterator_Remove passed on %d loop", i+1)
+	}
+}
+
+func testConcurrentLinkedQueueIteratorRemove(t *testing.T, queue *ConcurrentLinkedQueue[lang.Int], nodeNumber int) {
+	nodes := make(chan collections.StackNode[lang.Int], nodeNumber)
+	nodesIndex := make([]bool, nodeNumber)
+	b := rand.Int()&1 == 1
+	if b {
+		for i := 0; i < 4; i++ {
+			go func() {
+				for node := range nodes {
+					index := exceptions.Exec0r1(node.RemoveAndGet)
+					if nodesIndex[index] {
+						t.Fatalf("TODO Fatalf")
+					}
+					nodesIndex[index] = true
+				}
+			}()
+		}
+	}
+
+	for i := 0; i < nodeNumber; i++ {
 		node, _ := queue.OfferAndGetNode(lang.Int(i))
-		nodes = append(nodes, node)
-		//fmt.Println(queue)
+		nodes <- node
 	}
-	for _, node := range nodes {
-		fmt.Println(exceptions.Exec0r1(node.RemoveAndGet))
+
+	close(nodes)
+
+	if !b {
+		for i := 0; i < 4; i++ {
+			go func() {
+				for node := range nodes {
+					index := exceptions.Exec0r1(node.RemoveAndGet)
+					if nodesIndex[index] {
+						t.Fatalf("TODO Fatalf")
+					}
+					nodesIndex[index] = true
+				}
+			}()
+		}
 	}
-	if queue.Size() != 0 {
+
+	time.Sleep(time.Second / 5)
+
+	head := queue.head
+	if head != nil && head.deleted {
+		head = head.next
+	}
+	if head != nil {
 		t.Fatalf(fmt.Sprintf("queue remain %d element, is not thread safe", queue.Size()))
 	}
 }

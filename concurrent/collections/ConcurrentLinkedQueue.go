@@ -8,6 +8,8 @@ import (
 )
 
 type (
+	// ConcurrentLinkedQueue FIFO data struct, impl by linked list.
+	// in order to reuse ConcurrentLinkedStack, element will offer on queue's end, and poll on queue's head.
 	ConcurrentLinkedQueue[T lang.Object] struct {
 		lang.BaseObject
 		ConcurrentLinkedStack[T]
@@ -45,12 +47,21 @@ func (q *ConcurrentLinkedQueue[T]) OfferAndGetNode(element T) (collections.Queue
 	return &linkedQueueIterator[T]{queue: q, node: newNode}, nil
 }
 
+// offerAndGetNode offer an element on q.end
 func (q *ConcurrentLinkedQueue[T]) offerAndGetNode(element T) (*linkedStackNode[T], exceptions.Exception) {
 	newNode := &linkedStackNode[T]{value: element}
 	q.size.Add(1)
 
 	var next **linkedStackNode[T]
 	ref := q.end
+
+	// bug fix
+	// buf caused by delete q.end but not update it's reference
+	for ref != nil && ref.deleted {
+		ref = ref.next
+	}
+
+	// q.end is nil when queue just created
 	switch {
 	case ref == nil:
 		next = &q.head
@@ -67,6 +78,12 @@ func (q *ConcurrentLinkedQueue[T]) offerAndGetNode(element T) (*linkedStackNode[
 			}
 			next = &ref.next
 		}
+
+		// bug fix
+		// q.head may be deleted on async env
+		for *next != nil {
+			next = &(*next).next
+		}
 	}
 	q.end = newNode
 	return newNode, nil
@@ -80,6 +97,8 @@ func (q *ConcurrentLinkedQueue[T]) MutableIterator() collections.MutableIterator
 	return &linkedQueueIterator[T]{queue: q, node: q.head}
 }
 
+// Size size of queue
+// it may not correct on concurrent environment, to check it's empty, use func IsEmpty
 func (q *ConcurrentLinkedQueue[T]) Size() int {
 	return int(q.size.Load())
 }
