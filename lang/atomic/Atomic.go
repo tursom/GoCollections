@@ -20,41 +20,51 @@ type (
 		CompareAndSwapBit(bit int, old, new bool) (swapped bool)
 	}
 
-	Atomic[T any] struct {
-		Swap           func(addr *T, new T) (old T)
-		CompareAndSwap func(addr *T, old, new T) (swapped bool)
-		Load           func(addr *T) (val T)
-		Store          func(addr *T, val T)
+	Atomic[T any] interface {
+		Swap() func(addr *T, new T) (old T)
+		CompareAndSwap() func(addr *T, old, new T) (swapped bool)
+		Load() func(addr *T) (val T)
+		Store() func(addr *T, val T)
+	}
+
+	atomicImpl[T any] struct {
+		swap           func(addr *T, new T) (old T)
+		compareAndSwap func(addr *T, old, new T) (swapped bool)
+		load           func(addr *T) (val T)
+		store          func(addr *T, val T)
+	}
+
+	atomicTyped[T any] struct {
 	}
 )
 
 //goland:noinspection GoUnusedGlobalVariable
 var (
-	Int32F = Atomic[int32]{
+	Int32F Atomic[int32] = &atomicImpl[int32]{
 		SwapInt32,
 		CompareAndSwapInt32,
 		LoadInt32,
 		StoreInt32,
 	}
-	Int64F = Atomic[int64]{
+	Int64F Atomic[int64] = &atomicImpl[int64]{
 		SwapInt64,
 		CompareAndSwapInt64,
 		LoadInt64,
 		StoreInt64,
 	}
-	UInt32F = Atomic[uint32]{
+	UInt32F Atomic[uint32] = &atomicImpl[uint32]{
 		SwapUInt32,
 		CompareAndSwapUInt32,
 		LoadUint32,
 		StoreUInt32,
 	}
-	UInt64F = Atomic[uint64]{
+	UInt64F Atomic[uint64] = &atomicImpl[uint64]{
 		SwapUInt64,
 		CompareAndSwapUInt64,
 		LoadUint64,
 		StoreUInt64,
 	}
-	PointerF = Atomic[unsafe.Pointer]{
+	PointerF Atomic[unsafe.Pointer] = &atomicImpl[unsafe.Pointer]{
 		UnsafeSwapPointer,
 		UnsafeCompareAndSwapPointer,
 		UnsafeLoadPointer,
@@ -62,13 +72,40 @@ var (
 	}
 )
 
-func GetAtomic[T any]() *Atomic[*T] {
-	return &Atomic[*T]{
-		SwapPointer[T],
-		CompareAndSwapPointer[T],
-		LoadPointer[T],
-		StorePointer[T],
-	}
+func GetAtomic[T any]() Atomic[*T] {
+	return atomicTyped[T]{}
+}
+
+func (a atomicTyped[T]) Swap() func(addr **T, new *T) (old *T) {
+	return SwapPointer[T]
+}
+
+func (a atomicTyped[T]) CompareAndSwap() func(addr **T, old *T, new *T) (swapped bool) {
+	return CompareAndSwapPointer[T]
+}
+
+func (a atomicTyped[T]) Load() func(addr **T) (val *T) {
+	return LoadPointer[T]
+}
+
+func (a atomicTyped[T]) Store() func(addr **T, val *T) {
+	return StorePointer[T]
+}
+
+func (a *atomicImpl[T]) Swap() func(addr *T, new T) (old T) {
+	return a.swap
+}
+
+func (a *atomicImpl[T]) CompareAndSwap() func(addr *T, old T, new T) (swapped bool) {
+	return a.compareAndSwap
+}
+
+func (a *atomicImpl[T]) Load() func(addr *T) (val T) {
+	return a.load
+}
+
+func (a *atomicImpl[T]) Store() func(addr *T, val T) {
+	return a.store
 }
 
 func SwapInt32(addr *int32, new int32) (old int32) {

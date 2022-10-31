@@ -1,6 +1,9 @@
 package util
 
-import "github.com/tursom/GoCollections/concurrent/collections"
+import (
+	"github.com/tursom/GoCollections/concurrent/collections"
+	"github.com/tursom/GoCollections/lang"
+)
 
 type (
 	pipeline[T, R any] struct {
@@ -9,16 +12,16 @@ type (
 	}
 )
 
-func NewPipeline[T, R any](producer <-chan T, concurrency int, consumer func(T) R) <-chan R {
+func NewPipeline[T, R any](producer <-chan T, concurrency int, consumer func(T) R) lang.ReceiveChannel[R] {
 	var sequence collections.Sequence[R]
-	c := make(chan pipeline[T, R])
+	c := lang.NewChannel[pipeline[T, R]](0)
 	go func() {
 		defer close(c)
 		for value := range producer {
-			c <- pipeline[T, R]{
+			c.Send(pipeline[T, R]{
 				value:  value,
 				sender: sequence.Alloc(),
-			}
+			})
 		}
 	}()
 

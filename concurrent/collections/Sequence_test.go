@@ -10,7 +10,7 @@ import (
 func TestSequence_Alloc(t *testing.T) {
 	var sequence Sequence[int]
 	go func() {
-		for i := range sequence.Channel() {
+		for i := range sequence.RawChannel() {
 			fmt.Println(i)
 		}
 	}()
@@ -24,4 +24,5 @@ func TestSequence_Alloc(t *testing.T) {
 		}()
 	}
 	time.Sleep(time.Second * 10)
+	sequence.Close()
 }

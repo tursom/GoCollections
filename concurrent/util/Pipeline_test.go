@@ -20,7 +20,7 @@ func TestPipeline(t *testing.T) {
 		time.Sleep(time.Second)
 	}()
 
-	for i := range r {
+	for i := range r.RCh() {
 		fmt.Println(i)
 	}
 }

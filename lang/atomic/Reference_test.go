@@ -2,14 +2,26 @@ package atomic
 
 import (
 	"fmt"
-	"github.com/tursom/GoCollections/lang"
 	"testing"
 )
 
 func TestAtomic_Store(t *testing.T) {
-	a := &Reference[lang.Int]{}
-	var i lang.Int = 1
+	a := NewReference[int](nil)
+	var i = 1
 	a.Store(&i)
 	i = 2
-	fmt.Println(a.Load())
+	fmt.Println(*a.Load())
+}
+
+func TestReferenceOf(t *testing.T) {
+	one := 1
+
+	var p *int = nil
+	ref := ReferenceOf(&p)
+
+	ref.Store(&one)
+	fmt.Println(ref.Load())
+	fmt.Println(*ref.Load())
+
+	_ = *ref.AsUintptr() + 1
 }

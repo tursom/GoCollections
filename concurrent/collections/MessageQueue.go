@@ -3,76 +3,55 @@ package collections
 import (
 	"sync"
 
-	"github.com/tursom/GoCollections/concurrent"
-	"github.com/tursom/GoCollections/lang/atomic"
+	"github.com/tursom/GoCollections/exceptions"
+	"github.com/tursom/GoCollections/lang"
+)
+
+var (
+	// MessageQueueCapacity message capacity of MQ
+	// -1 to unlimited
+	// this variable can let you discover problems before OOM crash
+	MessageQueueCapacity  = 128
+	MessageQueueWarnLimit = MessageQueueCapacity / 2
 )
 
 type (
-	MessageQueue[T any] struct {
-		lock sync.Mutex
-		cond *sync.Cond
-		end  *messageQueueNode[T]
+	MessageQueue[T any] interface {
+		// Subscribe subscribe this message queue
+		Subscribe() lang.ReceiveChannel[T]
+		Send(msg T)
 	}
-
-	messageQueueNode[T any] struct {
-		value T
-		next  *messageQueueNode[T]
+	MessageQueueImpl[T lang.Object] struct {
+		chLock sync.Mutex
+		ch     lang.Channel[T]
 	}
 )
 
-func (q *MessageQueue[T]) getEnd() *messageQueueNode[T] {
-	if q.end == nil {
-		q.lock.Lock()
-		defer q.lock.Unlock()
-		if q.end == nil {
-			q.end = &messageQueueNode[T]{}
-		}
+func (m *MessageQueueImpl[T]) checkCh() {
+	if m.ch != nil {
+		return
 	}
-	return q.end
+
+	m.chLock.Lock()
+	defer m.chLock.Unlock()
+
+	if m.ch != nil {
+		return
+	}
+
+	m.ch = lang.NewChannel[T](MessageQueueCapacity)
 }
 
-func (q *MessageQueue[T]) getCond() *sync.Cond {
-	if q.cond == nil {
-		q.lock.Lock()
-		defer q.lock.Unlock()
-		q.cond = sync.NewCond(&q.lock)
-	}
-	return q.cond
+func (m *MessageQueueImpl[T]) Subscribe() lang.ReceiveChannel[T] {
+	m.checkCh()
+	// package ch, remove closer to empty body
+	// closer is nil will just close this channel
+	return lang.WithReceiveChannel[T](m.ch, func() {})
 }
 
-func (q *MessageQueue[T]) Subscribe() (in <-chan T, canceler func()) {
-	end := q.getEnd()
-	ch := make(chan T)
-	canceled := false
-	go func() {
-		cond := q.getCond()
-		node := end
-		for !canceled {
-			for node.next != nil {
-				if canceled {
-					return
-				}
-				node = node.next
-				ch <- node.value
-			}
-			concurrent.WaitCond(cond)
-		}
-	}()
-	return ch, func() {
-		canceled = true
+func (m *MessageQueueImpl[T]) Send(msg T) {
+	m.checkCh()
+	if !m.ch.TrySend(msg) {
+		panic(exceptions.NewIndexOutOfBound("object buffer of this MQ is full", nil))
 	}
-}
-
-func (q *MessageQueue[T]) Send(msg T) {
-	node := &messageQueueNode[T]{
-		value: msg,
-	}
-	p := &q.getEnd().next
-	for !atomic.CompareAndSwapPointer(p, nil, node) {
-		for *p != nil {
-			p = &q.end.next
-		}
-	}
-	q.end = node
-	q.getCond().Broadcast()
 }

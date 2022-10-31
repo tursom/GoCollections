@@ -3,9 +3,10 @@ package collections
 import (
 	"sync"
 
+	"github.com/tursom/GoCollections/concurrent"
 	"github.com/tursom/GoCollections/exceptions"
+	"github.com/tursom/GoCollections/lang"
 	"github.com/tursom/GoCollections/lang/atomic"
-	"github.com/tursom/GoCollections/util"
 )
 
 type (
@@ -13,10 +14,10 @@ type (
 	// 数据的接收顺序与 Sender 的生成顺序保持一致
 	Sequence[T any] struct {
 		lock  sync.Mutex
-		ch    chan T
+		ch    lang.Channel[T]
 		head  *sequenceNode[T]
 		end   **sequenceNode[T]
-		close sync.Once
+		close concurrent.Once
 	}
 
 	// SequenceSender 用于给 Sequence 发送信息
@@ -35,13 +36,13 @@ type (
 )
 
 // channel 懒加载 Sequence channel
-func (s *Sequence[T]) channel() chan T {
+func (s *Sequence[T]) channel() lang.Channel[T] {
 	// 经典懒加载单例写法
 	if s.ch == nil {
 		s.lock.Lock()
 		defer s.lock.Unlock()
 		if s.ch == nil {
-			s.ch = make(chan T, 16)
+			s.ch = lang.NewChannel[T](16)
 		}
 	}
 
@@ -49,8 +50,12 @@ func (s *Sequence[T]) channel() chan T {
 }
 
 // Channel 获取用于读取 Sequence 数据的 channel
-func (s *Sequence[T]) Channel() <-chan T {
+func (s *Sequence[T]) Channel() lang.ReceiveChannel[T] {
 	return s.channel()
+}
+
+func (s *Sequence[T]) RawChannel() <-chan T {
+	return s.channel().RCh()
 }
 
 func (s *Sequence[T]) Send(msg T) {
@@ -85,7 +90,7 @@ func (s *Sequence[T]) send() {
 	head := s.head
 	for head != nil && head.sent {
 		if head.cause == nil {
-			channel <- head.value
+			channel.Send(head.value)
 		} else {
 			s.Close()
 			panic(head.cause)
@@ -102,12 +107,12 @@ func (s *Sequence[T]) send() {
 
 func (s *Sequence[T]) Close() {
 	s.close.Do(func() {
-		close(s.channel())
+		s.channel().Close()
 	})
 }
 
 func (s *Sequence[T]) Closed() bool {
-	return util.OnceDone(&s.close)
+	return s.close.IsDone()
 }
 
 func (s *sequenceNode[T]) Send(value T) {
