@@ -35,15 +35,15 @@ func ConvChannel[T1, T2 any](c1 Channel[T1], recvConv func(T1) T2, sendConv func
 	return &convChannel[T1, T2]{c1, recvConv, sendConv}
 }
 
-func ConvSendChannel[T1, T2 any](c1 Channel[T1], sendConv func(T2) T1) SendChannelProxy[T2, T1] {
+func ConvSendChannel[T1, T2 any](c1 SendChannel[T1], sendConv func(T2) T1) SendChannelProxy[T2, T1] {
 	return &convSendChannel[T1, T2]{c1, sendConv}
 }
 
-func ConvReceiveChannel[T1, T2 any](c1 Channel[T1], recvConv func(T1) T2) ReceiveChannelProxy[T2, T1] {
+func ConvReceiveChannel[T1, T2 any](c1 ReceiveChannel[T1], recvConv func(T1) T2) ReceiveChannelProxy[T2, T1] {
 	return &convReceiveChannel[T1, T2]{c1, recvConv}
 }
 
-func FilterReceiveChannel[T any](c1 Channel[T], filter func(T) bool) ReceiveChannelProxy[T, T] {
+func FilterReceiveChannel[T any](c1 ReceiveChannel[T], filter func(T) bool) ReceiveChannelProxy[T, T] {
 	return &filterReceiveChannel[T]{c1, filter}
 }
 
