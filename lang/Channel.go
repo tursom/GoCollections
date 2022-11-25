@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2022 tursom. All rights reserved.
+ * Use of this source code is governed by a GPL-3
+ * license that can be found in the LICENSE file.
+ */
+
 package lang
 
 import "time"
@@ -23,6 +29,23 @@ type (
 		SendChannel[T]
 		ReceiveChannel[T]
 		Ch() chan T
+	}
+
+	SendChannelProxy[T, P any] interface {
+		SendChannel[T]
+		ProxySendChannel() SendChannel[P]
+	}
+
+	ReceiveChannelProxy[T, P any] interface {
+		ReceiveChannel[T]
+		ProxyReceiveChannel() ReceiveChannel[P]
+	}
+
+	ChannelProxy[T, P any] interface {
+		Channel[T]
+		SendChannelProxy[T, P]
+		ReceiveChannelProxy[T, P]
+		ProxyChannel() Channel[P]
 	}
 
 	RawChannel[T any] chan T

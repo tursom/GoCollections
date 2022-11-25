@@ -1,3 +1,7 @@
+#  Copyright (c) 2022 tursom. All rights reserved.
+#  Use of this source code is governed by a GPL-3
+#  license that can be found in the LICENSE file.
+
 # this script due to build Exec.go
 
 def arg_list(arg_size):

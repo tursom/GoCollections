@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2022 tursom. All rights reserved.
+ * Use of this source code is governed by a GPL-3
+ * license that can be found in the LICENSE file.
+ */
+
 package lang
 
 import (
@@ -39,7 +45,7 @@ func NewThreadLocal[T any]() ThreadLocal[T] {
 //goland:noinspection GoUnusedExportedFunction
 func NewThreadLocalWithInitial[T any](supplier func() T) ThreadLocal[T] {
 	return &threadLocalImpl[T]{
-		threadLocal: routine.NewThreadLocalWithInitial(func() routine.Any {
+		threadLocal: routine.NewThreadLocalWithInitial(func() any {
 			return supplier()
 		}),
 	}
@@ -55,7 +61,7 @@ func NewInheritableThreadLocal[T any]() ThreadLocal[T] {
 //goland:noinspection GoUnusedExportedFunction
 func NewInheritableThreadLocalWithInitial[T any](supplier func() T) ThreadLocal[T] {
 	return &threadLocalImpl[T]{
-		threadLocal: routine.NewInheritableThreadLocalWithInitial(func() routine.Any {
+		threadLocal: routine.NewInheritableThreadLocalWithInitial(func() any {
 			return supplier()
 		}),
 	}
