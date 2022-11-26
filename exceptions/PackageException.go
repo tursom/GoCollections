@@ -7,49 +7,14 @@
 package exceptions
 
 import (
-	"fmt"
-	"reflect"
+	"github.com/tursom/GoCollections/lang"
 )
 
-type PackageException struct {
-	RuntimeException
-	err any
-}
+type PackageException = lang.PackageException
 
 func NewPackageException(err any, config *ExceptionConfig) *PackageException {
-	message := ""
-	switch e := err.(type) {
-	case error:
-		message = e.Error()
-	default:
-		message = fmt.Sprint(e)
-	}
-	t := reflect.TypeOf(err)
-	message = fmt.Sprintf("%s (%s)", message, t.Name())
-	return &PackageException{
-		RuntimeException: NewRuntimeException(message, config.AddSkipStack(1).
-			SetExceptionName("github.com.tursom.GoCollections.exceptions.PackageException")),
-		err: err,
-	}
+	return lang.NewPackageException(err, config.AddSkipStack(1))
 }
-
-func (p *PackageException) Err() any {
-	return p.err
-}
-
 func UnpackException(err any) any {
-	for err != nil {
-		switch e := err.(type) {
-		case *PackageException:
-			return e.Err()
-		case Exception:
-			err = e.Cause()
-			if err == nil {
-				return e
-			}
-		default:
-			return err
-		}
-	}
-	return nil
+	return lang.UnpackException(err)
 }

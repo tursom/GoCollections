@@ -4,20 +4,27 @@
  * license that can be found in the LICENSE file.
  */
 
-package exceptions
+package lang
 
 import (
 	"fmt"
 	"io"
 	"os"
 	"strings"
-
-	"github.com/tursom/GoCollections/lang"
 )
 
-type Exception = lang.Exception
+type Exception interface {
+	Cause() Exception
+	Error() string
+	Name() string
+	Message() string
+	StackTrace() []StackTrace
+	PrintStackTrace()
+	PrintStackTraceTo(writer io.Writer)
+	BuildPrintStackTrace(builder *strings.Builder)
+}
 
-func PrintStackTraceByArray(writer io.Writer, trace []lang.StackTrace) {
+func PrintStackTraceByArray(writer io.Writer, trace []StackTrace) {
 	if trace == nil {
 		return
 	}
@@ -37,7 +44,7 @@ func PrintStackTraceByArray(writer io.Writer, trace []lang.StackTrace) {
 	}
 }
 
-func BuildStackTraceByArray(builder *strings.Builder, trace []lang.StackTrace) {
+func BuildStackTraceByArray(builder *strings.Builder, trace []StackTrace) {
 	if trace == nil {
 		return
 	}
@@ -88,41 +95,6 @@ func Print(err error) {
 		err.(Exception).PrintStackTrace()
 	default:
 		_, _ = fmt.Fprintln(os.Stderr, err)
-		PrintStackTraceByArray(os.Stderr, lang.GetStackTrace())
-	}
-}
-
-func Package(err error) Exception {
-	if err == nil {
-		return nil
-	}
-	switch err.(type) {
-	case Exception:
-		return err.(Exception)
-	}
-	return NewRuntimeException("", DefaultExceptionConfig().SetCause(err))
-}
-
-func PackageAny(err any) Exception {
-	if err == nil {
-		return nil
-	}
-	switch err.(type) {
-	case error:
-		return Package(err.(error))
-	default:
-		return NewRuntimeException("", DefaultExceptionConfig())
-	}
-}
-
-func PackagePanic(panic any, exceptionMessage string) Exception {
-	if panic == nil {
-		return nil
-	}
-	switch panic.(type) {
-	case error:
-		return NewRuntimeException(exceptionMessage, DefaultExceptionConfig().SetCause(panic))
-	default:
-		return NewPackageException(panic, nil)
+		PrintStackTraceByArray(os.Stderr, GetStackTrace())
 	}
 }
