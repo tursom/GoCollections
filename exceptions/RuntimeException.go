@@ -19,7 +19,7 @@ type RuntimeException struct {
 	lang.BaseObject
 	message       string
 	exceptionName string
-	stackTrace    []StackTrace
+	stackTrace    []lang.StackTrace
 	cause         Exception
 }
 
@@ -28,9 +28,9 @@ func NewRuntimeException(message string, config *ExceptionConfig) RuntimeExcepti
 		config = DefaultExceptionConfig()
 	}
 
-	var stackTrace []StackTrace = nil
+	var stackTrace []lang.StackTrace = nil
 	if config.GetStackTrace {
-		stackTrace = GetStackTraceSkipDeep(config.SkipStack + 1)
+		stackTrace = lang.GetStackTraceSkipDeep(config.SkipStack + 1)
 	}
 
 	var causeException Exception = nil
@@ -84,7 +84,7 @@ func (o RuntimeException) Name() string {
 	return o.exceptionName
 }
 
-func (o RuntimeException) StackTrace() []StackTrace {
+func (o RuntimeException) StackTrace() []lang.StackTrace {
 	return o.stackTrace
 }
 

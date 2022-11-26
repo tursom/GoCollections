@@ -11,6 +11,8 @@ import (
 	"io"
 	"os"
 	"strings"
+
+	"github.com/tursom/GoCollections/lang"
 )
 
 type Exception interface {
@@ -18,13 +20,13 @@ type Exception interface {
 	Error() string
 	Name() string
 	Message() string
-	StackTrace() []StackTrace
+	StackTrace() []lang.StackTrace
 	PrintStackTrace()
 	PrintStackTraceTo(writer io.Writer)
 	BuildPrintStackTrace(builder *strings.Builder)
 }
 
-func PrintStackTraceByArray(writer io.Writer, trace []StackTrace) {
+func PrintStackTraceByArray(writer io.Writer, trace []lang.StackTrace) {
 	if trace == nil {
 		return
 	}
@@ -44,7 +46,7 @@ func PrintStackTraceByArray(writer io.Writer, trace []StackTrace) {
 	}
 }
 
-func BuildStackTraceByArray(builder *strings.Builder, trace []StackTrace) {
+func BuildStackTraceByArray(builder *strings.Builder, trace []lang.StackTrace) {
 	if trace == nil {
 		return
 	}
@@ -95,7 +97,7 @@ func Print(err error) {
 		err.(Exception).PrintStackTrace()
 	default:
 		_, _ = fmt.Fprintln(os.Stderr, err)
-		PrintStackTraceByArray(os.Stderr, GetStackTrace())
+		PrintStackTraceByArray(os.Stderr, lang.GetStackTrace())
 	}
 }
 
