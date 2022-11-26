@@ -12,8 +12,6 @@ import (
 	"os"
 	"strings"
 	"unsafe"
-
-	"github.com/tursom/GoCollections/exceptions"
 )
 
 type TypeCastException struct {
@@ -81,10 +79,6 @@ func ForceCast[T any](v unsafe.Pointer) *T {
 	} else {
 		return (*T)(v)
 	}
-}
-
-func (t *TypeCastException) Cause() exceptions.Exception {
-	return nil
 }
 
 func (t *TypeCastException) Error() string {
