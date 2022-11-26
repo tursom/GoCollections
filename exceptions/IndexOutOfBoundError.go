@@ -12,7 +12,7 @@ type IndexOutOfBound struct {
 
 func NewIndexOutOfBound(message string, config *ExceptionConfig) *IndexOutOfBound {
 	return &IndexOutOfBound{
-		NewRuntimeException(message, config.AddSkipStack(1).
+		*NewRuntimeException(message, config.AddSkipStack(1).
 			SetExceptionName("github.com.tursom.GoCollections.exceptions.IndexOutOfBound")),
 	}
 }
