@@ -7,8 +7,19 @@
 package lang
 
 import (
+	"reflect"
 	"unsafe"
 )
+
+func TypeName[T any]() string {
+	t := reflect.TypeOf(Nil[T]())
+	return t.Name()
+}
+
+func TypeNameOf(v any) string {
+	t := reflect.TypeOf(v)
+	return t.Name()
+}
 
 func Nil[T any]() T {
 	var n T
@@ -33,28 +44,18 @@ func TryCast[T any](v any) (T, bool) {
 }
 
 func Cast[T any](v any) T {
-	defer func() {
-		r := recover()
-		if r != nil {
-			panic(NewTypeCastException("", r, nil))
-		}
-	}()
-
 	if v == nil {
 		return Nil[T]()
 	} else {
-		return v.(T)
+		t, ok := v.(T)
+		if !ok {
+			panic(NewTypeCastException2[T](v, nil))
+		}
+		return t
 	}
 }
 
 func ForceCast[T any](v unsafe.Pointer) *T {
-	defer func() {
-		r := recover()
-		if r != nil {
-			panic(NewTypeCastException("", r, nil))
-		}
-	}()
-
 	if v == nil {
 		return nil
 	} else {

@@ -6,6 +6,8 @@
 
 package lang
 
+import "fmt"
+
 type TypeCastException struct {
 	RuntimeException
 }
@@ -20,4 +22,8 @@ func NewTypeCastException(message string, err any, config *ExceptionConfig) *Typ
 			SetCause(err).
 			SetExceptionName("github.com.tursom.GoCollections.exceptions.TypeCastException")),
 	}
+}
+
+func NewTypeCastException2[T any](v any, config *ExceptionConfig) *TypeCastException {
+	return NewTypeCastException(fmt.Sprintf("type %s cannot cast to %s", TypeNameOf(v), TypeName[T]()), nil, config)
 }
