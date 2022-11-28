@@ -7,33 +7,13 @@
 package atomic
 
 import (
-	"fmt"
+	"strconv"
 	"sync/atomic"
 
 	"github.com/tursom/GoCollections/lang"
 )
 
 type Int32 int32
-
-func (v *Int32) AsInt32() lang.Int32 {
-	return lang.Int32(*v)
-}
-
-func (v *Int32) String() string {
-	return fmt.Sprint(*v)
-}
-
-func (v *Int32) AsObject() lang.Object {
-	return v
-}
-
-func (v *Int32) Equals(o lang.Object) bool {
-	return lang.EqualsInt32(v, o)
-}
-
-func (v *Int32) HashCode() int32 {
-	return v.AsInt32().V()
-}
 
 func (v *Int32) P() *int32 {
 	return (*int32)(v)
@@ -69,4 +49,32 @@ func (v *Int32) SetBit(bit int, up bool) bool {
 
 func (v *Int32) CompareAndSwapBit(bit int, old, new bool) bool {
 	return CompareAndSwapBit(CompareAndSwapInt32, v.P(), bit, old, new)
+}
+
+func (v *Int32) String() string {
+	return strconv.FormatInt(int64(*v), 10)
+}
+
+func (v *Int32) AsObject() lang.Object {
+	return v
+}
+
+func (v *Int32) Equals(o lang.Object) bool {
+	return lang.EqualsInt32(v, o)
+}
+
+func (v *Int32) HashCode() int32 {
+	return lang.Hash32(v)
+}
+
+func (v *Int32) ToInt64() lang.Int64 {
+	return lang.Int64(*v)
+}
+
+func (v *Int32) ToUInt64() lang.UInt64 {
+	return lang.UInt64(*v)
+}
+
+func (v *Int32) ToFloat64() lang.Float64 {
+	return lang.Float64(*v)
 }

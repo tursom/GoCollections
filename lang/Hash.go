@@ -30,12 +30,12 @@ func HashAddr[V any](v *V) int32 {
 }
 
 func Hash32[T any](p *T) int32 {
-	return *(*int32)(unsafe.Pointer(p))
+	return HashInt32(*(*int32)(unsafe.Pointer(p)))
 }
 
 func Hash64[T any](p *T) int32 {
 	i := *(*int64)(unsafe.Pointer(p))
-	return int32(i) ^ int32(i>>32)
+	return HashInt64(i)
 }
 
 func HashString(str string) int32 {

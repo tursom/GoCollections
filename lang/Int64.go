@@ -10,25 +10,42 @@ import "strconv"
 
 type Int64 int64
 
-type AsInt64 interface {
-	Object
-	AsInt64() Int64
-}
-
 func CastInt64(v any) (int64, bool) {
 	switch i := v.(type) {
+	case int:
+		return int64(i), true
+	case int8:
+		return int64(i), true
+	case int16:
+		return int64(i), true
+	case int32:
+		return int64(i), true
 	case int64:
 		return i, true
-	case AsInt64:
-		return i.AsInt64().V(), true
+	case uint:
+		return int64(i), true
+	case uint8:
+		return int64(i), true
+	case uint16:
+		return int64(i), true
+	case uint32:
+		return int64(i), true
+	case uint64:
+		return int64(i), true
+	case float32:
+		return int64(i), true
+	case float64:
+		return int64(i), true
+	case Number:
+		return i.ToInt64().V(), true
 	default:
 		return 0, false
 	}
 }
 
-func EqualsInt64(i1 AsInt64, i2 any) bool {
+func EqualsInt64(i1 Number, i2 any) bool {
 	i2, ok := CastInt64(i2)
-	return ok && i2 == i1.AsInt64().V()
+	return ok && i2 == i1.ToUInt64().V()
 }
 
 func (i Int64) V() int64 {
@@ -37,10 +54,6 @@ func (i Int64) V() int64 {
 
 func (i *Int64) P() *int64 {
 	return (*int64)(i)
-}
-
-func (i Int64) AsInt64() Int64 {
-	return i
 }
 
 func (i Int64) String() string {
@@ -60,7 +73,7 @@ func (i Int64) ToString() String {
 }
 
 func (i Int64) HashCode() int32 {
-	return Hash64(&i)
+	return HashInt64(int64(i))
 }
 
 func (i Int64) Compare(t Int64) int {
@@ -72,4 +85,20 @@ func (i Int64) Compare(t Int64) int {
 	default:
 		return -1
 	}
+}
+
+func (i Int64) ToInt64() Int64 {
+	return Int64(i)
+}
+
+func (i Int64) ToUInt64() UInt64 {
+	return UInt64(i)
+}
+
+func (i Int64) ToFloat64() Float64 {
+	return Float64(i)
+}
+
+func HashInt64(i int64) int32 {
+	return int32(i) ^ int32(i>>32)
 }

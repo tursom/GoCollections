@@ -10,25 +10,42 @@ import "strconv"
 
 type UInt16 uint16
 
-type AsUInt16 interface {
-	Object
-	AsUInt16() UInt16
-}
-
 func CastUInt16(v any) (uint16, bool) {
 	switch i := v.(type) {
+	case int:
+		return uint16(i), true
+	case int8:
+		return uint16(i), true
+	case int16:
+		return uint16(i), true
+	case int32:
+		return uint16(i), true
+	case int64:
+		return uint16(i), true
+	case uint:
+		return uint16(i), true
+	case uint8:
+		return uint16(i), true
 	case uint16:
 		return i, true
-	case AsUInt16:
-		return i.AsUInt16().V(), true
+	case uint32:
+		return uint16(i), true
+	case uint64:
+		return uint16(i), true
+	case float32:
+		return uint16(i), true
+	case float64:
+		return uint16(i), true
+	case Number:
+		return uint16(i.ToUInt64().V()), true
 	default:
 		return 0, false
 	}
 }
 
-func EqualsUInt16(i1 AsUInt16, i2 any) bool {
+func EqualsUInt16(i1 Number, i2 any) bool {
 	i2, ok := CastUInt16(i2)
-	return ok && i2 == i1.AsUInt16().V()
+	return ok && i2 == i1.ToUInt64().V()
 }
 
 func (i UInt16) V() uint16 {
@@ -37,10 +54,6 @@ func (i UInt16) V() uint16 {
 
 func (i *UInt16) P() *uint16 {
 	return (*uint16)(i)
-}
-
-func (i UInt16) AsUInt16() UInt16 {
-	return i
 }
 
 func (i UInt16) String() string {
@@ -60,7 +73,7 @@ func (i UInt16) ToString() String {
 }
 
 func (i UInt16) HashCode() int32 {
-	return int32(i)
+	return HashUInt16(uint16(i))
 }
 
 func (i UInt16) Compare(t UInt16) int {
@@ -72,4 +85,20 @@ func (i UInt16) Compare(t UInt16) int {
 	default:
 		return -1
 	}
+}
+
+func (i UInt16) ToInt64() Int64 {
+	return Int64(i)
+}
+
+func (i UInt16) ToUInt64() UInt64 {
+	return UInt64(i)
+}
+
+func (i UInt16) ToFloat64() Float64 {
+	return Float64(i)
+}
+
+func HashUInt16(i uint16) int32 {
+	return HashUInt32(uint32(i))
 }

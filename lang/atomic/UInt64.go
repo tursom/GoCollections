@@ -7,7 +7,10 @@
 package atomic
 
 import (
+	"strconv"
 	"sync/atomic"
+
+	"github.com/tursom/GoCollections/lang"
 )
 
 type UInt64 uint64
@@ -46,4 +49,32 @@ func (v *UInt64) SetBit(bit int, up bool) bool {
 
 func (v *UInt64) CompareAndSwapBit(bit int, old, new bool) bool {
 	return CompareAndSwapBit(CompareAndSwapUInt64, v.P(), bit, old, new)
+}
+
+func (v *UInt64) String() string {
+	return strconv.FormatUint(uint64(*v), 10)
+}
+
+func (v *UInt64) AsObject() lang.Object {
+	return v
+}
+
+func (v *UInt64) Equals(o lang.Object) bool {
+	return lang.EqualsUInt64(v, o)
+}
+
+func (v *UInt64) HashCode() int32 {
+	return int32(*v) ^ int32(*v>>32)
+}
+
+func (v *UInt64) ToInt64() lang.Int64 {
+	return lang.Int64(*v)
+}
+
+func (v *UInt64) ToUInt64() lang.UInt64 {
+	return lang.UInt64(*v)
+}
+
+func (v *UInt64) ToFloat64() lang.Float64 {
+	return lang.Float64(*v)
 }

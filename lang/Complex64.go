@@ -37,5 +37,5 @@ func (i Complex64) ToString() String {
 }
 
 func (i Complex64) HashCode() int32 {
-	return Float32(real(complex64(i))).HashCode() ^ Float32(imag(complex64(i))).HashCode()
+	return Float32(real(i)).HashCode() ^ Float32(imag(i)).HashCode()
 }
