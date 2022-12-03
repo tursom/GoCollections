@@ -8,12 +8,9 @@ package atomic
 
 import (
 	"fmt"
-	"reflect"
 	"sync"
 	"testing"
 	"time"
-
-	"github.com/tursom/GoCollections/lang"
 )
 
 func TestInt32_SetBit(t *testing.T) {
@@ -55,15 +52,4 @@ func TestInt32_CompareAndSwapBit(t *testing.T) {
 	cond.Done()
 	time.Sleep(1 * time.Second)
 	fmt.Println(i.Load())
-}
-
-func TestTypeConv(t *testing.T) {
-	var intV lang.Int32
-	var i any = intV
-	_, ok := i.(lang.AsInt32)
-	fmt.Println(reflect.TypeOf(i), ok)
-
-	i = &intV
-	_, ok = i.(lang.AsInt32)
-	fmt.Println(reflect.TypeOf(i), ok)
 }

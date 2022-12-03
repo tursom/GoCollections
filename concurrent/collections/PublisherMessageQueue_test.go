@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/tursom/GoCollections/util/unsafe"
+	"github.com/tursom/GoCollections/unsafe"
 )
 
 func TestPublisherMessageQueueNode_Sizeof(t *testing.T) {

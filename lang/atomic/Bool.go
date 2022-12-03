@@ -6,19 +6,17 @@
 
 package atomic
 
-type Bool struct {
-	i Int32
-}
+type Bool Int32
 
 func (v *Bool) Load() (val bool) {
-	return v.i.Load() != 0
+	return (*Int32)(v).Load() != 0
 }
 
 func (v *Bool) Store(val bool) {
 	if val {
-		v.i.Store(1)
+		(*Int32)(v).Store(1)
 	} else {
-		v.i.Store(0)
+		(*Int32)(v).Store(0)
 	}
 }
 
@@ -27,7 +25,7 @@ func (v *Bool) Swap(new bool) (old bool) {
 	if new {
 		n = 1
 	}
-	return v.i.Swap(n) != 0
+	return (*Int32)(v).Swap(n) != 0
 }
 
 func (v *Bool) CompareAndSwap(old, new bool) (swapped bool) {
@@ -39,5 +37,5 @@ func (v *Bool) CompareAndSwap(old, new bool) (swapped bool) {
 	if new {
 		n = 1
 	}
-	return v.i.CompareAndSwap(o, n)
+	return (*Int32)(v).CompareAndSwap(o, n)
 }

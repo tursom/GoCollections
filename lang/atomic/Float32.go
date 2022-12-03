@@ -42,10 +42,10 @@ func (v *Float32) CompareAndSwap(old, new float32) (swapped bool) {
 }
 
 func (v *Float32) Add(f float32) (new float32) {
-	old := float32(*v)
+	old := v.Load()
 	new = old + f
 	for !v.CompareAndSwap(old, new) {
-		old = float32(*v)
+		old = v.Load()
 		new = old + f
 	}
 

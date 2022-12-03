@@ -14,7 +14,7 @@ import (
 )
 
 type (
-	Atomizer[T any] interface {
+	Atomic[T any] interface {
 		Swap(new T) (old T)
 		CompareAndSwap(old, new T) (swapped bool)
 		Load() (val T)
@@ -26,91 +26,91 @@ type (
 		CompareAndSwapBit(bit int, old, new bool) (swapped bool)
 	}
 
-	Atomic[T any] interface {
+	Atomizer[T any] interface {
 		Swap() func(addr *T, new T) (old T)
 		CompareAndSwap() func(addr *T, old, new T) (swapped bool)
 		Load() func(addr *T) (val T)
 		Store() func(addr *T, val T)
 	}
 
-	atomicImpl[T any] struct {
+	atomizerImpl[T any] struct {
 		swap           func(addr *T, new T) (old T)
 		compareAndSwap func(addr *T, old, new T) (swapped bool)
 		load           func(addr *T) (val T)
 		store          func(addr *T, val T)
 	}
-
-	atomicTyped[T any] struct {
-	}
 )
 
-//goland:noinspection GoUnusedGlobalVariable
 var (
-	Int32F Atomic[int32] = &atomicImpl[int32]{
+	int32Atomizer = &atomizerImpl[int32]{
 		SwapInt32,
 		CompareAndSwapInt32,
 		LoadInt32,
 		StoreInt32,
 	}
-	Int64F Atomic[int64] = &atomicImpl[int64]{
+	int64Atomizer = &atomizerImpl[int64]{
 		SwapInt64,
 		CompareAndSwapInt64,
 		LoadInt64,
 		StoreInt64,
 	}
-	UInt32F Atomic[uint32] = &atomicImpl[uint32]{
+	uint32Atomizer = &atomizerImpl[uint32]{
 		SwapUInt32,
 		CompareAndSwapUInt32,
 		LoadUint32,
 		StoreUInt32,
 	}
-	UInt64F Atomic[uint64] = &atomicImpl[uint64]{
+	uint64Atomizer = &atomizerImpl[uint64]{
 		SwapUInt64,
 		CompareAndSwapUInt64,
 		LoadUint64,
 		StoreUInt64,
 	}
-	PointerF Atomic[unsafe.Pointer] = &atomicImpl[unsafe.Pointer]{
-		UnsafeSwapPointer,
-		UnsafeCompareAndSwapPointer,
-		UnsafeLoadPointer,
-		UnsafeStorePointer,
+	pointerAtomizer = &atomizerImpl[unsafe.Pointer]{
+		atomic.SwapPointer,
+		atomic.CompareAndSwapPointer,
+		atomic.LoadPointer,
+		atomic.StorePointer,
 	}
 )
 
-func GetAtomic[T any]() Atomic[*T] {
-	return atomicTyped[T]{}
+func Int32Atomizer() Atomizer[int32] {
+	return int32Atomizer
 }
 
-func (a atomicTyped[T]) Swap() func(addr **T, new *T) (old *T) {
-	return SwapPointer[T]
+func Int64Atomizer() Atomizer[int64] {
+	return int64Atomizer
 }
 
-func (a atomicTyped[T]) CompareAndSwap() func(addr **T, old *T, new *T) (swapped bool) {
-	return CompareAndSwapPointer[T]
+func UInt32Atomizer() Atomizer[uint32] {
+	return uint32Atomizer
 }
 
-func (a atomicTyped[T]) Load() func(addr **T) (val *T) {
-	return LoadPointer[T]
+func UInt64Atomizer() Atomizer[uint64] {
+	return uint64Atomizer
 }
 
-func (a atomicTyped[T]) Store() func(addr **T, val *T) {
-	return StorePointer[T]
+func PointerAtomizer() Atomizer[unsafe.Pointer] {
+	return pointerAtomizer
 }
 
-func (a *atomicImpl[T]) Swap() func(addr *T, new T) (old T) {
+func GetAtomizer[T any]() Atomizer[*T] {
+	return (*atomizerImpl[*T])(unsafe.Pointer(pointerAtomizer))
+}
+
+func (a *atomizerImpl[T]) Swap() func(addr *T, new T) (old T) {
 	return a.swap
 }
 
-func (a *atomicImpl[T]) CompareAndSwap() func(addr *T, old T, new T) (swapped bool) {
+func (a *atomizerImpl[T]) CompareAndSwap() func(addr *T, old T, new T) (swapped bool) {
 	return a.compareAndSwap
 }
 
-func (a *atomicImpl[T]) Load() func(addr *T) (val T) {
+func (a *atomizerImpl[T]) Load() func(addr *T) (val T) {
 	return a.load
 }
 
-func (a *atomicImpl[T]) Store() func(addr *T, val T) {
+func (a *atomizerImpl[T]) Store() func(addr *T, val T) {
 	return a.store
 }
 

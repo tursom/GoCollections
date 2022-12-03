@@ -8,7 +8,6 @@ package lang
 
 import (
 	"reflect"
-	"unsafe"
 )
 
 func TypeName[T any]() string {
@@ -52,13 +51,5 @@ func Cast[T any](v any) T {
 			panic(NewTypeCastException2[T](v, nil))
 		}
 		return t
-	}
-}
-
-func ForceCast[T any](v unsafe.Pointer) *T {
-	if v == nil {
-		return nil
-	} else {
-		return (*T)(v)
 	}
 }

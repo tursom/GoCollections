@@ -11,21 +11,15 @@ import (
 	"unsafe"
 
 	"github.com/tursom/GoCollections/lang"
-)
 
-//goland:noinspection GoUnusedGlobalVariable
-var (
-	UnsafeLoadPointer           = atomic.LoadPointer
-	UnsafeStorePointer          = atomic.StorePointer
-	UnsafeSwapPointer           = atomic.SwapPointer
-	UnsafeCompareAndSwapPointer = atomic.CompareAndSwapPointer
+	unsafe2 "github.com/tursom/GoCollections/unsafe"
 )
 
 type (
 	Pointer  = unsafe.Pointer
 	PPointer = *unsafe.Pointer
 
-	// Reference atomic type T reference
+	// Reference atomizer type T reference
 	Reference[T any] struct {
 		lang.BaseObject
 		p *T
@@ -34,16 +28,16 @@ type (
 
 // NewReference new *Reference[T] init by given reference
 func NewReference[T any](reference *T) *Reference[T] {
-	return lang.ForceCast[Reference[T]](Pointer(&reference))
+	return unsafe2.ForceCast[Reference[T]](Pointer(&reference))
 }
 
 // ReferenceOf cast **T to *Reference[T]
 func ReferenceOf[T any](reference **T) *Reference[T] {
-	return lang.ForceCast[Reference[T]](Pointer(reference))
+	return unsafe2.ForceCast[Reference[T]](Pointer(reference))
 }
 
 func ReferenceUintptr[T any](reference *uintptr) *Reference[T] {
-	return lang.ForceCast[Reference[T]](Pointer(reference))
+	return unsafe2.ForceCast[Reference[T]](Pointer(reference))
 }
 
 func (r *Reference[T]) AsPointer() Pointer {
@@ -55,7 +49,7 @@ func (r *Reference[T]) AsPPointer() PPointer {
 }
 
 func (r *Reference[T]) AsUintptr() *TypedUintptr[T] {
-	return lang.ForceCast[TypedUintptr[T]](r.AsPointer())
+	return unsafe2.ForceCast[TypedUintptr[T]](r.AsPointer())
 }
 
 func (r *Reference[T]) pointer() **T {

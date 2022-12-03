@@ -9,7 +9,7 @@ package atomic
 import (
 	"sync/atomic"
 
-	"github.com/tursom/GoCollections/lang"
+	"github.com/tursom/GoCollections/unsafe"
 )
 
 type (
@@ -17,8 +17,8 @@ type (
 	TypedUintptr[T any] Uintptr
 )
 
-func (p Uintptr) Raw() uintptr {
-	return uintptr(p)
+func (p *Uintptr) Raw() uintptr {
+	return uintptr(*p)
 }
 
 func (p *Uintptr) RawP() *uintptr {
@@ -48,8 +48,8 @@ func (p *Uintptr) CompareAndSwap(old, new Uintptr) (swapped bool) {
 	return atomic.CompareAndSwapUintptr((*uintptr)(p), uintptr(old), uintptr(new))
 }
 
-func (p TypedUintptr[T]) Raw() uintptr {
-	return uintptr(p)
+func (p *TypedUintptr[T]) Raw() uintptr {
+	return uintptr(*p)
 }
 
 func (p *TypedUintptr[T]) RawP() *uintptr {
@@ -65,11 +65,11 @@ func (p *TypedUintptr[T]) AsPPointer() PPointer {
 }
 
 func (tp *TypedUintptr[T]) AsReference() *Reference[T] {
-	return lang.ForceCast[Reference[T]](Pointer(tp))
+	return unsafe.ForceCast[Reference[T]](Pointer(tp))
 }
 
-func (tp TypedUintptr[T]) Uintptr() Uintptr {
-	return Uintptr(tp)
+func (tp *TypedUintptr[T]) Uintptr() Uintptr {
+	return Uintptr(*tp)
 }
 
 func (tp *TypedUintptr[T]) PUintptr() *Uintptr {
