@@ -99,6 +99,15 @@ func (i Int8) ToFloat64() Float64 {
 	return Float64(i)
 }
 
+func (i *Int8) BitLength() int {
+	return 8
+}
+
+func (i *Int8) SetBit(bit int, up bool) (old bool) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func HashInt8(i int8) int32 {
 	return HashInt32(int32(i))
 }
