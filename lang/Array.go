@@ -3,8 +3,8 @@ package lang
 type (
 	Array[T any] []T
 
-	Int8Array       Array[Int32]
-	Int16Array      Array[Int32]
+	Int8Array       Array[Int8]
+	Int16Array      Array[Int16]
 	Int32Array      Array[Int32]
 	Int64Array      Array[Int64]
 	UInt8Array      Array[UInt8]
@@ -25,54 +25,54 @@ func (a Int8Array) SetBit(bit int, up bool) (old bool) {
 	arrIndex := bit / 8
 	i := &a[arrIndex]
 
-	return a[arrIndex].SwapBit(bit%8, up)
+	return SwapBit[int8]((*int8)(i), bit%8, up)
 }
 
 func (a Int16Array) SetBit(bit int, up bool) (old bool) {
 	arrIndex := bit / 16
 	i := &a[arrIndex]
 
-	return SwapBit(i, bit%16, up)
+	return SwapBit[int16]((*int16)(i), bit%16, up)
 }
 
 func (a Int32Array) SetBit(bit int, up bool) (old bool) {
 	arrIndex := bit / 32
 	i := &a[arrIndex]
 
-	return SwapBit(i, bit%32, up)
+	return SwapBit[int32]((*int32)(i), bit%32, up)
 }
 
 func (a Int64Array) SetBit(bit int, up bool) (old bool) {
 	arrIndex := bit / 64
 	i := &a[arrIndex]
 
-	return SwapBit(i, bit%64, up)
+	return SwapBit[int64]((*int64)(i), bit%64, up)
 }
 
 func (a UInt8Array) SetBit(bit int, up bool) (old bool) {
 	arrIndex := bit / 8
 	i := &a[arrIndex]
 
-	return SwapBit(i, bit%8, up)
+	return SwapBit[uint8]((*uint8)(i), bit%8, up)
 }
 
 func (a UInt16Array) SetBit(bit int, up bool) (old bool) {
 	arrIndex := bit / 16
 	i := &a[arrIndex]
 
-	return SwapBit(i, bit%16, up)
+	return SwapBit[uint16]((*uint16)(i), bit%16, up)
 }
 
 func (a UInt32Array) SetBit(bit int, up bool) (old bool) {
 	arrIndex := bit / 32
 	i := &a[arrIndex]
 
-	return SwapBit(i, bit%32, up)
+	return SwapBit[uint32]((*uint32)(i), bit%32, up)
 }
 
 func (a UInt64Array) SetBit(bit int, up bool) (old bool) {
 	arrIndex := bit / 64
 	i := &a[arrIndex]
 
-	return SwapBit(i, bit%64, up)
+	return SwapBit[uint64]((*uint64)(i), bit%64, up)
 }
