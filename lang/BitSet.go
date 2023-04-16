@@ -8,7 +8,8 @@ package lang
 
 type (
 	BitSet interface {
-		BitLength() int
-		SetBit(bit int, up bool) (old bool)
+		BitLength() uint
+		SetBit(index uint, up bool) (old bool)
+		GetBit(index uint) (ok bool)
 	}
 )

@@ -1,5 +1,7 @@
 package lang
 
+import "unsafe"
+
 type (
 	Array[T any] []T
 
@@ -21,58 +23,102 @@ func (a Array[T]) Array() []T {
 	return a
 }
 
-func (a Int8Array) SetBit(bit int, up bool) (old bool) {
-	arrIndex := bit / 8
-	i := &a[arrIndex]
-
-	return SwapBit[int8]((*int8)(i), bit%8, up)
+func (a UInt8Array) Bytes() []byte {
+	return *(*[]byte)(unsafe.Pointer(&a))
 }
 
-func (a Int16Array) SetBit(bit int, up bool) (old bool) {
-	arrIndex := bit / 16
-	i := &a[arrIndex]
-
-	return SwapBit[int16]((*int16)(i), bit%16, up)
+func (a Int8Array) BitLength() uint {
+	return uint(len(a) * 8)
 }
 
-func (a Int32Array) SetBit(bit int, up bool) (old bool) {
-	arrIndex := bit / 32
-	i := &a[arrIndex]
-
-	return SwapBit[int32]((*int32)(i), bit%32, up)
+func (a Int16Array) BitLength() uint {
+	return uint(len(a) * 16)
 }
 
-func (a Int64Array) SetBit(bit int, up bool) (old bool) {
-	arrIndex := bit / 64
-	i := &a[arrIndex]
-
-	return SwapBit[int64]((*int64)(i), bit%64, up)
+func (a Int32Array) BitLength() uint {
+	return uint(len(a) * 32)
 }
 
-func (a UInt8Array) SetBit(bit int, up bool) (old bool) {
-	arrIndex := bit / 8
-	i := &a[arrIndex]
-
-	return SwapBit[uint8]((*uint8)(i), bit%8, up)
+func (a Int64Array) BitLength() uint {
+	return uint(len(a) * 64)
 }
 
-func (a UInt16Array) SetBit(bit int, up bool) (old bool) {
-	arrIndex := bit / 16
-	i := &a[arrIndex]
-
-	return SwapBit[uint16]((*uint16)(i), bit%16, up)
+func (a UInt8Array) BitLength() uint {
+	return uint(len(a) * 8)
 }
 
-func (a UInt32Array) SetBit(bit int, up bool) (old bool) {
-	arrIndex := bit / 32
-	i := &a[arrIndex]
-
-	return SwapBit[uint32]((*uint32)(i), bit%32, up)
+func (a UInt16Array) BitLength() uint {
+	return uint(len(a) * 16)
 }
 
-func (a UInt64Array) SetBit(bit int, up bool) (old bool) {
-	arrIndex := bit / 64
-	i := &a[arrIndex]
+func (a UInt32Array) BitLength() uint {
+	return uint(len(a) * 32)
+}
 
-	return SwapBit[uint64]((*uint64)(i), bit%64, up)
+func (a UInt64Array) BitLength() uint {
+	return uint(len(a) * 64)
+}
+
+func (a Int8Array) GetBit(index uint) (ok bool) {
+	return GetBit(a[index/8], index%8)
+}
+
+func (a Int16Array) GetBit(index uint) (ok bool) {
+	return GetBit(a[index/16], index%16)
+}
+
+func (a Int32Array) GetBit(index uint) (ok bool) {
+	return GetBit(a[index/32], index%32)
+}
+
+func (a Int64Array) GetBit(index uint) (ok bool) {
+	return GetBit(a[index/64], index%64)
+}
+
+func (a UInt8Array) GetBit(index uint) (ok bool) {
+	return GetBit(a[index/8], index%8)
+}
+
+func (a UInt16Array) GetBit(index uint) (ok bool) {
+	return GetBit(a[index/16], index%16)
+}
+
+func (a UInt32Array) GetBit(index uint) (ok bool) {
+	return GetBit(a[index/32], index%32)
+}
+
+func (a UInt64Array) GetBit(index uint) (ok bool) {
+	return GetBit(a[index/64], index%64)
+}
+
+func (a Int8Array) SetBit(index uint, up bool) (old bool) {
+	return SwapBit(&a[index/8], index%8, up)
+}
+
+func (a Int16Array) SetBit(index uint, up bool) (old bool) {
+	return SwapBit(&a[index/16], index%16, up)
+}
+
+func (a Int32Array) SetBit(index uint, up bool) (old bool) {
+	return SwapBit(&a[index/32], index%32, up)
+}
+
+func (a Int64Array) SetBit(index uint, up bool) (old bool) {
+	return SwapBit(&a[index/64], index%64, up)
+}
+
+func (a UInt8Array) SetBit(index uint, up bool) (old bool) {
+	return SwapBit(&a[index/8], index%8, up)
+}
+
+func (a UInt16Array) SetBit(index uint, up bool) (old bool) {
+	return SwapBit(&a[index/16], index%16, up)
+}
+
+func (a UInt32Array) SetBit(index uint, up bool) (old bool) {
+	return SwapBit(&a[index/32], index%32, up)
+}
+
+func (a UInt64Array) SetBit(index uint, up bool) (old bool) {
+	return SwapBit(&a[index/64], index%64, up)
 }

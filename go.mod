@@ -4,5 +4,6 @@ go 1.20
 
 require (
 	github.com/petermattis/goid v0.0.0-20220302125637-5f11c28912df
+	github.com/spaolacci/murmur3 v1.1.0
 	github.com/timandy/routine v1.1.1
 )
