@@ -42,3 +42,9 @@ func AsBytes[T any](arr []T) []byte {
 func AsString(bytes []byte) string {
 	return *ForceCast[string](unsafe.Pointer(&bytes))
 }
+
+func IndexOf[T any](s []T, v *T) int {
+	begin := *(*uintptr)(unsafe.Pointer(&s))
+	addr := uintptr(unsafe.Pointer(v))
+	return int((addr - begin) / reflect.TypeOf(*v).Size())
+}

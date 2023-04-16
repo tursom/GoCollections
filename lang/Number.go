@@ -13,7 +13,8 @@ type Number interface {
 	ToFloat64() Float64
 }
 
-func SwapBit[T int8 | int16 | int32 | int64 | uint8 | uint16 | uint32 | uint64](p *T, bit int, new bool) (old bool) {
+func SwapBit[T int8 | int16 | int32 | int64 | uint8 | uint16 | uint32 | uint64 |
+	Int8 | Int16 | Int32 | Int64 | UInt8 | UInt16 | UInt32 | UInt64](p *T, bit int, new bool) (old bool) {
 	location := T(1) << bit
 	oldValue := *p
 	var newValue T
@@ -23,5 +24,5 @@ func SwapBit[T int8 | int16 | int32 | int64 | uint8 | uint16 | uint32 | uint64](
 		newValue = oldValue & ^location
 	}
 	*p = newValue
-	return oldValue&newValue != 0
+	return oldValue&location != 0
 }

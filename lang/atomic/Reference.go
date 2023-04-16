@@ -28,7 +28,7 @@ type (
 
 // NewReference new *Reference[T] init by given reference
 func NewReference[T any](reference *T) *Reference[T] {
-	return unsafe2.ForceCast[Reference[T]](Pointer(&reference))
+	return &Reference[T]{p: reference}
 }
 
 // ReferenceOf cast **T to *Reference[T]
