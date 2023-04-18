@@ -70,7 +70,7 @@ func (b *Bloom) M() uint {
 func (b *Bloom) Contains(data []byte) bool {
 	for i := 0; i < int(b.k); i++ {
 		hashCode := uint(HashFunc(data, uint32(i)))
-		if !b.m.GetBit(hashCode & b.m.BitLength()) {
+		if !b.m.GetBit(hashCode % b.m.BitLength()) {
 			return false
 		}
 	}
