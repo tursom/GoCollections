@@ -1,10 +1,14 @@
 package bloom
 
 import (
+	"encoding/binary"
+	"io"
 	"math"
+	"unsafe"
 
 	"github.com/spaolacci/murmur3"
 
+	"github.com/tursom/GoCollections/exceptions"
 	"github.com/tursom/GoCollections/lang"
 )
 
@@ -83,5 +87,31 @@ func (b *Bloom) Add(data []byte) {
 	for i := 0; i < int(b.k); i++ {
 		hashCode := uint(HashFunc(data, uint32(i)))
 		b.m.SetBit(hashCode%b.m.BitLength(), true)
+	}
+}
+
+func (b *Bloom) Marshal(writer io.Writer) {
+	if err := binary.Write(writer, binary.BigEndian, uint32(b.k)); err != nil {
+		panic(exceptions.Package(err))
+	}
+	if err := binary.Write(writer, binary.BigEndian, uint32(b.c)); err != nil {
+		panic(exceptions.Package(err))
+	}
+
+	if _, err := writer.Write(b.m.Bytes()); err != nil {
+		panic(exceptions.Package(err))
+	}
+}
+
+func Unmarshal(data []byte) *Bloom {
+	k := binary.BigEndian.Uint32(data)
+	c := binary.BigEndian.Uint32(data[4:])
+
+	m := data[8:]
+
+	return &Bloom{
+		m: *(*lang.UInt8Array)(unsafe.Pointer(&m)),
+		k: uint(k),
+		c: uint(c),
 	}
 }
