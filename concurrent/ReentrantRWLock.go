@@ -48,6 +48,26 @@ func (rt *ReentrantRWLock) Lock() {
 	rt.rlock.Lock()
 }
 
+func (rt *ReentrantRWLock) TryLock() bool {
+	id := GetGoroutineID()
+	rt.lock.Lock()
+	defer rt.lock.Unlock()
+
+	if rt.host == id {
+		rt.recursion++
+		return true
+	}
+
+	if rt.recursion == 0 {
+		rt.host = id
+		rt.recursion = 1
+		rt.rlock.Lock()
+		return true
+	}
+
+	return false
+}
+
 func (rt *ReentrantRWLock) Unlock() {
 	rt.lock.Lock()
 	defer rt.lock.Unlock()
@@ -68,6 +88,13 @@ func (rt *ReentrantRWLock) RLock() {
 		return
 	}
 	rt.rlock.RLock()
+}
+
+func (rt *ReentrantRWLock) TryRLock() bool {
+	if rt.host == GetGoroutineID() {
+		return true
+	}
+	return rt.rlock.TryRLock()
 }
 
 func (rt *ReentrantRWLock) RUnlock() {

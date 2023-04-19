@@ -19,8 +19,9 @@ type (
 
 	ReceiveChannel[T any] interface {
 		Close()
+		// RCh raw channel
 		RCh() <-chan T
-		Receive() T
+		Receive() (T, bool)
 		TryReceive() (T, bool)
 		ReceiveTimeout(timeout time.Duration) (T, bool)
 	}
@@ -102,8 +103,9 @@ func (ch RawChannel[T]) RCh() <-chan T {
 	return ch
 }
 
-func (ch RawChannel[T]) Receive() T {
-	return <-ch
+func (ch RawChannel[T]) Receive() (T, bool) {
+	value, ok := <-ch
+	return value, ok
 }
 
 func (ch RawChannel[T]) TryReceive() (T, bool) {

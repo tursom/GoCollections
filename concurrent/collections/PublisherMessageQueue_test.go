@@ -31,7 +31,7 @@ func TestMessageQueue_Subscribe(t *testing.T) {
 			}()
 
 			for true {
-				msg := subscribe.Receive()
+				msg, _ := subscribe.Receive()
 				fmt.Println(id, msg)
 			}
 		}()

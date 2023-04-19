@@ -9,11 +9,13 @@ package concurrent
 type (
 	Lock interface {
 		Lock()
+		TryLock() bool
 		Unlock()
 	}
 	RWLock interface {
 		Lock
 		RLock()
+		TryRLock() bool
 		RUnlock()
 	}
 )

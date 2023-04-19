@@ -6,7 +6,9 @@
 
 package lang
 
-import "time"
+import (
+	"time"
+)
 
 type (
 	convChannel[T1, T2 any] struct {
@@ -71,8 +73,13 @@ func (c *convChannel[T1, T2]) RCh() <-chan T2 {
 	return nil
 }
 
-func (c *convChannel[T1, T2]) Receive() T2 {
-	return c.recvConv(c.channel.Receive())
+func (c *convChannel[T1, T2]) Receive() (T2, bool) {
+	value, ok := c.channel.Receive()
+	if !ok {
+		return Nil[T2](), false
+	}
+
+	return c.recvConv(value), true
 }
 
 func (c *convChannel[T1, T2]) TryReceive() (T2, bool) {
@@ -141,8 +148,13 @@ func (c *convReceiveChannel[T1, T2]) RCh() <-chan T2 {
 	return nil
 }
 
-func (c *convReceiveChannel[T1, T2]) Receive() T2 {
-	return c.recvConv(c.channel.Receive())
+func (c *convReceiveChannel[T1, T2]) Receive() (T2, bool) {
+	value, ok := c.channel.Receive()
+	if !ok {
+		return Nil[T2](), false
+	}
+
+	return c.recvConv(value), true
 }
 
 func (c *convReceiveChannel[T1, T2]) TryReceive() (T2, bool) {
@@ -171,13 +183,13 @@ func (c *filterReceiveChannel[T]) RCh() <-chan T {
 	return nil
 }
 
-func (f *filterReceiveChannel[T]) Receive() T {
-	obj := f.ReceiveChannel.Receive()
+func (f *filterReceiveChannel[T]) Receive() (T, bool) {
+	obj, _ := f.ReceiveChannel.Receive()
 	for !f.filter(obj) {
-		obj = f.ReceiveChannel.Receive()
+		obj, _ = f.ReceiveChannel.Receive()
 	}
 
-	return obj
+	return obj, false
 }
 
 func (f *filterReceiveChannel[T]) TryReceive() (T, bool) {

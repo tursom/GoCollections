@@ -1,5 +1,6 @@
 package bloom
 
+import "C"
 import (
 	"encoding/binary"
 	"io"

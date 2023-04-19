@@ -10,7 +10,9 @@ import (
 	"bytes"
 	"compress/gzip"
 	"fmt"
+	"math"
 	"testing"
+	"time"
 )
 
 func TestBloom_Contains(t *testing.T) {
@@ -32,6 +34,51 @@ func TestBloom_Contains(t *testing.T) {
 	}
 }
 
+func TestBloom_miss(t *testing.T) {
+	//HashFunc = func(data []byte, seed uint32) uint32 {
+	//	return murmur3.Sum32WithSeed(data, seed)
+	//	//	h1, _ := murmur3.Sum128WithSeed(data, seed)
+	//	//	return uint32(h1)
+	//}
+
+	var base uint = 1000_0000
+	bloom := NewBloom(base, 0.03)
+
+	t1 := time.Now()
+
+	for i := 0; i < int(base/1000); i++ {
+		bloom.Add([]byte(fmt.Sprintf("%d", i)))
+	}
+
+	counter := make([]uint, 256)
+	for _, value := range bloom.m {
+		counter[value]++
+	}
+
+	miss := 0
+	for i := base; i < base*2; i++ {
+		if bloom.Contains([]byte(fmt.Sprintf("%d", i))) {
+			miss += 1
+		}
+	}
+
+	t2 := time.Now()
+
+	fmt.Println(miss, float64(miss)/float64(base))
+	fmt.Println(counter)
+
+	var H float64
+	for _, c := range counter {
+		if c == 0 {
+			continue
+		}
+		p := float64(c) / float64(len(bloom.m))
+		H += -p * math.Log2(p)
+	}
+	fmt.Println(H / 8)
+	fmt.Println(t2.Sub(t1))
+}
+
 func gz(b []byte) []byte {
 	buffer := bytes.NewBuffer(nil)
 
@@ -43,8 +90,8 @@ func gz(b []byte) []byte {
 }
 
 func TestCalcBitLength(t *testing.T) {
-	//fmt.Printf("%d\n", CalcBitLength(100_0000, 0.1)/8)
-	for i := 1; i < 63; i++ {
+	//fmt.Printf("%d\n", CalcBitLength(1024*1024*1024, 0.03)/8)
+	for i := 0; i < 63; i++ {
 		var n uint = 1 << i
 		numBytes := CalcBitLength(n, 0.1) / 8
 		fmt.Printf("%d: %d, %s / %s = %f\n",

@@ -29,6 +29,25 @@ func NewReentrantLock() *ReentrantLock {
 	return res
 }
 
+func (rt *ReentrantLock) TryLock() bool {
+	id := GetGoroutineID()
+	rt.lock.Lock()
+	defer rt.lock.Unlock()
+
+	if rt.host == id {
+		rt.recursion++
+		return true
+	}
+
+	if rt.recursion == 0 {
+		rt.host = id
+		rt.recursion = 1
+		return true
+	}
+
+	return false
+}
+
 func (rt *ReentrantLock) Lock() {
 	id := GetGoroutineID()
 	rt.lock.Lock()
