@@ -1,6 +1,7 @@
 package bloom
 
 import (
+	"bytes"
 	"encoding/binary"
 	"io"
 	"math"
@@ -18,6 +19,7 @@ var (
 
 type (
 	Bloom struct {
+		lang.BaseObject
 		m lang.UInt8Array
 		k uint
 		c uint
@@ -114,6 +116,15 @@ func Unmarshal(data []byte) *Bloom {
 		k: uint(k),
 		c: uint(c),
 	}
+}
+
+func (b *Bloom) Equals(t lang.Object) bool {
+	tb, ok := t.(*Bloom)
+	if !ok {
+		return false
+	}
+
+	return tb.k == b.k && bytes.Compare(b.m.Bytes(), tb.m.Bytes()) == 0
 }
 
 func (b *Bloom) Merge(t *Bloom) bool {
