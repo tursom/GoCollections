@@ -1,6 +1,5 @@
 package bloom
 
-import "C"
 import (
 	"encoding/binary"
 	"io"
@@ -115,4 +114,16 @@ func Unmarshal(data []byte) *Bloom {
 		k: uint(k),
 		c: uint(c),
 	}
+}
+
+func (b *Bloom) Merge(bitMap []byte) bool {
+	if len(b.m) != len(bitMap) {
+		return false
+	}
+
+	for i := range b.m {
+		b.m[i] |= lang.UInt8(bitMap[i])
+	}
+
+	return true
 }
