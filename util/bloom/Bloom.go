@@ -116,7 +116,21 @@ func Unmarshal(data []byte) *Bloom {
 	}
 }
 
-func (b *Bloom) Merge(bitMap []byte) bool {
+func (b *Bloom) Merge(t *Bloom) bool {
+	if b.k != t.k {
+		return false
+	} else if len(b.m) != len(t.m) {
+		return false
+	}
+
+	for i := range b.m {
+		b.m[i] |= t.m[i]
+	}
+
+	return true
+}
+
+func (b *Bloom) MergeBM(bitMap []byte) bool {
 	if len(b.m) != len(bitMap) {
 		return false
 	}
