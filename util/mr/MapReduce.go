@@ -36,6 +36,7 @@ func MultiMap[V, R any](values <-chan V, m func(value V) R) <-chan R {
 
 	c := atomic.Int32(1)
 	for value0 := range values {
+		c.Add(1)
 		value := value0
 		go func() {
 			rc <- m(value)

@@ -86,6 +86,7 @@ func (b *Bloom) Contains(data []byte) bool {
 }
 
 func (b *Bloom) Add(data []byte) {
+	b.hashCode = 0
 	b.c++
 	for i := 0; i < int(b.k); i++ {
 		hashCode := uint(HashFunc(data, uint32(i)))
@@ -142,6 +143,7 @@ func (b *Bloom) Merge(t *Bloom) bool {
 		return false
 	}
 
+	b.hashCode = 0
 	for i := range b.m {
 		b.m[i] |= t.m[i]
 	}
@@ -154,6 +156,7 @@ func (b *Bloom) MergeBM(bitMap []byte) bool {
 		return false
 	}
 
+	b.hashCode = 0
 	for i := range b.m {
 		b.m[i] |= lang.UInt8(bitMap[i])
 	}
