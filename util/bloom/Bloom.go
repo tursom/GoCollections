@@ -20,9 +20,10 @@ var (
 type (
 	Bloom struct {
 		lang.BaseObject
-		m lang.UInt8Array
-		k uint
-		c uint
+		m        lang.UInt8Array
+		k        uint
+		c        uint
+		hashCode int32
 	}
 )
 
@@ -128,7 +129,10 @@ func (b *Bloom) Equals(t lang.Object) bool {
 }
 
 func (b *Bloom) HashCode() int32 {
-	return int32(murmur3.Sum32(b.m.Bytes()))
+	if b.hashCode == 0 {
+		b.hashCode = int32(murmur3.Sum32(b.m.Bytes()))
+	}
+	return b.hashCode
 }
 
 func (b *Bloom) Merge(t *Bloom) bool {
