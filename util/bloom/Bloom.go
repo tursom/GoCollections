@@ -127,6 +127,10 @@ func (b *Bloom) Equals(t lang.Object) bool {
 	return tb.k == b.k && bytes.Compare(b.m.Bytes(), tb.m.Bytes()) == 0
 }
 
+func (b *Bloom) HashCode() int32 {
+	return int32(murmur3.Sum32(b.m.Bytes()))
+}
+
 func (b *Bloom) Merge(t *Bloom) bool {
 	if b.k != t.k {
 		return false
