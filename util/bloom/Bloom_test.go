@@ -12,7 +12,8 @@ import (
 	"fmt"
 	"math"
 	"testing"
-	"time"
+
+	"github.com/tursom/GoCollections/util/time"
 )
 
 func TestBloom_Contains(t *testing.T) {
@@ -46,7 +47,7 @@ func TestBloom_miss(t *testing.T) {
 
 	t1 := time.Now()
 
-	for i := 0; i < int(base/1000); i++ {
+	for i := 0; i < int(base); i++ {
 		bloom.Add([]byte(fmt.Sprintf("%d", i)))
 	}
 

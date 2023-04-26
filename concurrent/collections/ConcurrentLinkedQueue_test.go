@@ -11,8 +11,9 @@ import (
 	"math/rand"
 	"sync"
 	"testing"
-	"time"
 	"unsafe"
+
+	"github.com/tursom/GoCollections/util/time"
 
 	"github.com/tursom/GoCollections/collections"
 	"github.com/tursom/GoCollections/exceptions"

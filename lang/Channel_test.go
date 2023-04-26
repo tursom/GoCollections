@@ -9,7 +9,8 @@ package lang
 import (
 	"fmt"
 	"testing"
-	"time"
+
+	"github.com/tursom/GoCollections/util/time"
 )
 
 func TestChannel_Send(t *testing.T) {

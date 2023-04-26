@@ -7,7 +7,7 @@
 package lang
 
 import (
-	"time"
+	"github.com/tursom/GoCollections/util/time"
 )
 
 type (

@@ -6,7 +6,7 @@
 
 package lang
 
-import "time"
+import "github.com/tursom/GoCollections/util/time"
 
 type (
 	SendChannel[T any] interface {

@@ -10,7 +10,8 @@ import (
 	"fmt"
 	"sync"
 	"testing"
-	"time"
+
+	"github.com/tursom/GoCollections/util/time"
 )
 
 func TestInt32_SetBit(t *testing.T) {

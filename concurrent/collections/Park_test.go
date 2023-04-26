@@ -2,7 +2,8 @@ package collections
 
 import (
 	"testing"
-	"time"
+
+	"github.com/tursom/GoCollections/util/time"
 )
 
 func TestPark_Park(t *testing.T) {

@@ -9,7 +9,8 @@ package collections
 import (
 	"log"
 	"sync"
-	"time"
+
+	"github.com/tursom/GoCollections/util/time"
 
 	"github.com/tursom/GoCollections/concurrent"
 	"github.com/tursom/GoCollections/exceptions"

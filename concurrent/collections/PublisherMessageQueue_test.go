@@ -9,7 +9,8 @@ package collections
 import (
 	"fmt"
 	"testing"
-	"time"
+
+	"github.com/tursom/GoCollections/util/time"
 
 	"github.com/tursom/GoCollections/unsafe"
 )

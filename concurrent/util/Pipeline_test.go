@@ -9,7 +9,8 @@ package util
 import (
 	"fmt"
 	"testing"
-	"time"
+
+	"github.com/tursom/GoCollections/util/time"
 )
 
 func TestPipeline(t *testing.T) {

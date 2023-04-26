@@ -10,7 +10,8 @@ import (
 	"fmt"
 	"math/rand"
 	"testing"
-	"time"
+
+	"github.com/tursom/GoCollections/util/time"
 )
 
 func TestSequence_Alloc(t *testing.T) {

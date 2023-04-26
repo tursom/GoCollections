@@ -8,7 +8,8 @@ package concurrent
 
 import (
 	"sync"
-	"time"
+
+	"github.com/tursom/GoCollections/util/time"
 )
 
 type (

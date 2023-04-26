@@ -9,7 +9,8 @@ package concurrent
 import (
 	"fmt"
 	"testing"
-	"time"
+
+	"github.com/tursom/GoCollections/util/time"
 )
 
 func TestReentrantRWLock_RLock(t *testing.T) {

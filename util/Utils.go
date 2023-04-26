@@ -24,3 +24,13 @@ func (s Stringer) String() string {
 	}
 	return s.stringer()
 }
+
+func Reverse[T any](s []T) []T {
+	for i := 0; i < len(s)/2; i++ {
+		temp := s[i]
+		s[i] = s[len(s)-i-1]
+		s[len(s)-i-1] = temp
+	}
+
+	return s
+}
